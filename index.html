@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="es-BO">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ugo's Pizza · Sólo para hermosos · Santa Cruz de la Sierra</title>
+  <meta name="description" content="Ugo's Pizza: más de 20 sabores con masa madre y salsa de tomate a la leña. 9 sucursales en Santa Cruz, combos familiares desde Bs 60 y La Scoobyneta, el delivery de Ugo's. Pedí por WhatsApp.">
+  <meta name="theme-color" content="#ff4200">
+  <link rel="canonical" href="https://ugos-pizza.vercel.app/">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" href="assets/brand/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <meta property="og:type" content="restaurant">
+  <meta property="og:site_name" content="Ugo's Pizza">
+  <meta property="og:title" content="Ugo's Pizza · Sólo para hermosos">
+  <meta property="og:description" content="Masa madre, salsa a la leña y más de 20 sabores. 9 sucursales en Santa Cruz. Pedí por WhatsApp.">
+  <meta property="og:image" content="https://ugos-pizza.vercel.app/assets/brand/ugos-logo-share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="1200">
+  <meta property="og:locale" content="es_BO">
+  <meta property="og:url" content="https://ugos-pizza.vercel.app/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Ugo's Pizza · Sólo para hermosos">
+  <meta name="twitter:description" content="Masa madre, salsa a la leña y más de 20 sabores en Santa Cruz.">
+  <meta name="twitter:image" content="https://ugos-pizza.vercel.app/assets/brand/ugos-logo-share.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preload" as="image" href="assets/hero/slide-2-jamoneitor.webp" fetchpriority="high">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Restaurant","name":"Ugo's Pizza","slogan":"Sólo para hermosos","servesCuisine":["Pizza"],"priceRange":"Bs 44 – Bs 100","url":"https://ugos-pizza.vercel.app/","logo":"https://ugos-pizza.vercel.app/assets/brand/logo-512.png","image":"https://ugos-pizza.vercel.app/assets/brand/ugos-logo-share.jpg","telephone":"+59160007071","address":{"@type":"PostalAddress","addressLocality":"Santa Cruz de la Sierra","addressCountry":"BO"},"sameAs":["https://www.instagram.com/ugos_pizza/","https://www.ugospizzas.com/"]}
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+
+  <!-- 2. Promo ticker -->
+  <div class="ticker" aria-label="Promociones">
+    <div class="ticker__track" id="tickerTrack"></div>
+  </div>
+
+  <!-- 3. Header -->
+  <header class="hdr" id="hdr">
+    <div class="hdr__row wrap">
+      <a class="brand" href="#top" aria-label="Ugo's Pizza, inicio">
+        <img src="assets/img/logo.png" width="44" height="44" alt="">
+        <span class="brand__word">Ugo's Pizza</span>
+      </a>
+      <nav class="pill pill--inline" aria-label="Principal" id="pillInline"></nav>
+      <div class="hdr__right">
+        <a class="openNow" href="#sucursales" id="openNow"><span class="dot"></span><span id="openNowTxt">…</span></a>
+        <button class="ib ib--menu" id="burger" aria-expanded="false" aria-controls="mnav"><span class="ib__ring"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span><span class="ib__lbl">Menú</span></button>
+        <a class="btn-start" href="#pedir" id="startBtn">Empezar pedido</a>
+        <button class="ib ib--help" data-open-chat aria-label="Ayuda: abrir asistente"><span class="ib__ring"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M9 10h.01M12 10h.01M15 10h.01"/></svg></span><span class="ib__lbl">Ayuda</span></button>
+        <button class="ib ib--cart" id="cartBtn" aria-label="Ver pedido"><span class="ib__ring"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg><b class="count" id="cartCount" hidden>0</b></span><span class="ib__lbl">Pedido</span></button>
+      </div>
+    </div>
+    <div class="hdr__row2 wrap"><nav class="pill" aria-label="Secciones" id="pillMain"></nav></div>
+  </header>
+  <div class="mnav" id="mnav" hidden><nav id="mnavList" aria-label="Menú móvil"></nav></div>
+
+  <main id="main">
+    <!-- 4. Hero carousel -->
+    <section class="hero" id="top" aria-roledescription="carrusel" aria-label="Promos de Ugo's">
+      <h1 class="vh">Ugo's Pizza · pizzería en Santa Cruz de la Sierra</h1>
+      <div class="hero__stack" id="slides"></div>
+      <div class="hero__ctrl wrap">
+        <div class="dots" id="dots" role="tablist" aria-label="Elegir promo"></div>
+        <p class="terms" id="terms"></p>
+      </div>
+      <aside class="qr" id="qrCard">
+        <button class="qr__x" aria-label="Ocultar QR" id="qrX">✕</button>
+        <img src="assets/brand/qr-whatsapp.svg" width="96" height="96" alt="Código QR para pedir por WhatsApp">
+        <b>¡Pedí por WhatsApp!</b>
+      </aside>
+      <div class="checker checker--bottom" aria-hidden="true"></div>
+
+      <!-- 5. Order box -->
+      <form class="orderbox" id="orderbox" aria-label="¿Dónde querés tu pedido?">
+        <p class="orderbox__t">¿Dónde querés tu pedido?</p>
+        <div class="seg" role="radiogroup" aria-label="Tipo de pedido">
+          <label><input type="radio" name="ob-intent" value="delivery" checked><span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="17" r="2.5"/><circle cx="18" cy="17" r="2.5"/><path d="M8.5 17h7M4 13h7l2-5h3l2 6M13 8h-2"/></svg>Delivery</span></label>
+          <label><input type="radio" name="ob-intent" value="pickup"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10l1-5h14l1 5M5 10v9h14v-9M4 10h16M10 19v-5h4v5"/></svg>Recoger</span></label>
+        </div>
+        <div class="orderbox__row">
+          <label class="vh" for="obBranch">Sucursal</label>
+          <select id="obBranch"></select>
+          <button class="btn btn--dark" type="submit">Empezar →</button>
+        </div>
+        <p class="orderbox__st" id="obStatus"></p>
+      </form>
+    </section>
+
+    <!-- 6. Offers row -->
+    <section class="offers" id="promos" aria-labelledby="offersT">
+      <div class="wrap"><h2 class="offers__t" id="offersT">Descubrí nuestras promos</h2></div>
+      <div class="rail-wrap">
+        <button class="rail-btn rail-btn--l" data-rail="offersRail" data-dir="-1" aria-label="Anterior">‹</button>
+        <div class="rail offers__rail" id="offersRail"></div>
+        <button class="rail-btn rail-btn--r" data-rail="offersRail" data-dir="1" aria-label="Siguiente">›</button>
+      </div>
+      <div class="wrap center"><a class="ulink" href="https://www.instagram.com/ugos_pizza/" target="_blank" rel="noopener">Ver todas las promos ↗</a></div>
+    </section>
+
+    <!-- 7. Weekly promos (rendered only if data.weekly has items) -->
+    <section class="weekly" id="semana" hidden></section>
+
+    <!-- The spinning menu: "La carta gira" -->
+    <section class="spin" id="carta" aria-labelledby="spinT">
+      <div class="wrap spin__head">
+        <p class="eyebrow">La carta gira</p>
+        <h2 class="display" id="spinT">Girá la mesa, <span class="hl">elegí tu pizza</span></h2>
+        <p class="sub">Arrastrá, deslizá o usá las flechas. Tocá la pizza para ver qué lleva y sumarla al pedido.</p>
+      </div>
+      <div class="spin__stage wrap" id="spinStage">
+        <div class="spin__copy" id="spinCopy" aria-live="polite"></div>
+        <div class="spin__table" id="spinTable" tabindex="0" role="listbox" aria-label="Pizzas: usá las flechas izquierda y derecha para girar">
+          <div class="board" aria-hidden="true">
+            <div class="board__disc" id="boardDisc">
+              <svg class="board__rim" viewBox="0 0 400 400"><defs><path id="rimPath" d="M200,200 m-176,0 a176,176 0 1,1 352,0 a176,176 0 1,1 -352,0"/></defs>
+                <text><textPath href="#rimPath">UGO'S PIZZA · SÓLO PARA HERMOSOS · MASA MADRE · SALSA A LA LEÑA · UGO'S PIZZA · SÓLO PARA HERMOSOS · MASA MADRE · SALSA A LA LEÑA ·</textPath></text>
+              </svg>
+            </div>
+          </div>
+          <div class="spin__pizzas" id="spinPizzas"></div>
+        </div>
+        <div class="spin__nav">
+          <button class="rbtn" id="spinPrev" aria-label="Pizza anterior">‹</button>
+          <span class="spin__count" id="spinCount">01 / 18</span>
+          <button class="rbtn" id="spinNext" aria-label="Pizza siguiente">›</button>
+        </div>
+      </div>
+      <a class="spin__all" href="#menu">Ver la carta entera ↓</a>
+      <aside class="pdetail" id="pdetail" role="dialog" aria-modal="true" aria-labelledby="pdName" hidden>
+        <button class="pdetail__x" id="pdX" aria-label="Cerrar">✕</button>
+        <div id="pdBody"></div>
+      </aside>
+      <div class="pdetail__scrim" id="pdScrim" hidden></div>
+    </section>
+
+    <!-- 8. Monthly special -->
+    <section class="yapa" id="yapa" hidden></section>
+
+    <!-- 9. Menu list -->
+    <section class="menu" id="menu" aria-labelledby="menuT">
+      <div class="wrap">
+        <div class="shead">
+          <p class="eyebrow">La carta</p>
+          <h2 class="display" id="menuT">Más de 20 sabores, <span class="hl">masa madre</span></h2>
+          <p class="sub" id="menuSub"></p>
+        </div>
+        <div class="coins" id="coins"></div>
+        <div class="tabs" role="tablist" id="tabs" aria-label="Categorías"></div>
+        <div id="menuPanels"></div>
+      </div>
+    </section>
+
+    <!-- 10. Combos + featured -->
+    <section class="combos" id="combos" aria-labelledby="combosT">
+      <div class="wrap">
+        <div class="shead shead--light">
+          <p class="eyebrow">Combos familiares</p>
+          <h2 class="display" id="combosT">Pizza + gaseosa, <span class="hl">8 porciones</span></h2>
+          <p class="sub">Todos en tamaño familiar. Los precios son los de nuestras promos publicadas.</p>
+        </div>
+        <div class="ccards" id="ccards"></div>
+        <div class="feat" id="featured"></div>
+        <p class="fine" id="combosFine">Combos según ugospizzas.com · La promo de Jamoneitor a Bs 35 aplica sólo pidiendo por La Scoobyneta.</p>
+      </div>
+    </section>
+
+    <!-- 11. Reels -->
+    <section class="reels" id="reels" aria-labelledby="reelsT">
+      <div class="wrap reels__head">
+        <div>
+          <p class="eyebrow">@ugos_pizza</p>
+          <h2 class="display" id="reelsT">Ugo's en <span class="hl">acción</span></h2>
+        </div>
+        <div class="reels__btns">
+          <button class="rbtn" data-rail="reelsRail" data-dir="-1" aria-label="Anterior">‹</button>
+          <button class="rbtn" data-rail="reelsRail" data-dir="1" aria-label="Siguiente">›</button>
+        </div>
+      </div>
+      <div class="rail reels__rail" id="reelsRail"></div>
+    </section>
+
+    <!-- 12. WhatsApp funnel -->
+    <section class="funnel" id="pedir" aria-labelledby="funnelT">
+      <div class="wrap funnel__grid">
+        <div>
+          <div class="shead shead--light">
+            <p class="eyebrow">Pedí por WhatsApp</p>
+            <h2 class="display" id="funnelT">Tu pedido en <span class="hl">4 pasos</span></h2>
+          </div>
+          <form id="funnel" class="fform" novalidate>
+            <ol class="steps" id="stepsBar"></ol>
+            <fieldset class="fstep" data-step="1">
+              <legend>1 · ¿Qué necesitás?</legend>
+              <div class="chips chips--big" role="radiogroup">
+                <label><input type="radio" name="intent" value="delivery" checked><span>🛵 Delivery</span></label>
+                <label><input type="radio" name="intent" value="pickup"><span>🏪 Recoger</span></label>
+                <label><input type="radio" name="intent" value="event"><span>🎉 Mesa o evento</span></label>
+                <label><input type="radio" name="intent" value="question"><span>💬 Consulta</span></label>
+              </div>
+              <div class="fnav"><button type="button" class="btn btn--mustard" data-next>Seguir →</button></div>
+            </fieldset>
+            <fieldset class="fstep" data-step="2" hidden>
+              <legend>2 · Detalles</legend>
+              <div data-for="order">
+                <div id="fCart" class="fcart"></div>
+                <details class="picker"><summary>+ Agregar pizzas y combos</summary><div id="fPicker" class="picker__grid"></div></details>
+              </div>
+              <div data-for="event" hidden>
+                <div class="frow"><label>Fecha<input type="date" name="evDate"></label><label>Personas<input type="number" name="evPeople" min="1" max="500" inputmode="numeric"></label></div>
+                <label>Ocasión<input name="evOcc" maxlength="80" placeholder="Cumpleaños, oficina, colegio…"></label>
+              </div>
+              <div data-for="question" hidden>
+                <label>¿Sobre qué?<select name="qTopic"><option>Menú y precios</option><option>Promos</option><option>Delivery</option><option>Sucursales y horarios</option><option>Franquicias</option><option>Otro</option></select></label>
+                <button type="button" class="btn btn--ghost" data-open-chat>Preguntale a Ugo·IA ✨</button>
+              </div>
+              <div class="fnav"><button type="button" class="btn btn--ghost" data-prev>← Atrás</button><button type="button" class="btn btn--mustard" data-next>Seguir →</button></div>
+            </fieldset>
+            <fieldset class="fstep" data-step="3" hidden>
+              <legend>3 · Tus datos</legend>
+              <label>Tu nombre<input name="name" autocomplete="given-name" maxlength="40" required></label>
+              <label>Sucursal<select name="branch" id="fBranch"></select></label>
+              <div data-for="delivery">
+                <label>Dirección<input name="address" autocomplete="street-address" maxlength="120"></label>
+                <label>Referencia<input name="reference" maxlength="120" placeholder="Portón negro, frente a la plaza…"></label>
+              </div>
+              <div class="chips" role="radiogroup" aria-label="¿Cuándo?">
+                <label><input type="radio" name="when" value="asap" checked><span>Lo antes posible</span></label>
+                <label><input type="radio" name="when" value="later"><span>Programar</span></label>
+              </div>
+              <label data-for="later" hidden>Hora<input type="time" name="time"></label>
+              <label>Nota<textarea name="note" rows="2" maxlength="200"></textarea></label>
+              <div class="fnav"><button type="button" class="btn btn--ghost" data-prev>← Atrás</button><button type="button" class="btn btn--mustard" data-next>Revisar →</button></div>
+            </fieldset>
+            <fieldset class="fstep" data-step="4" hidden>
+              <legend>4 · Revisá y enviá</legend>
+              <pre class="review" id="review"></pre>
+              <p class="fmsg" id="fMsg" aria-live="polite"></p>
+              <div class="fnav"><button type="button" class="btn btn--ghost" data-prev>← Atrás</button><a class="btn btn--wa btn--lg" id="sendWa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a></div>
+            </fieldset>
+          </form>
+        </div>
+        <div class="phone" aria-hidden="true">
+          <div class="phone__top"><img src="assets/img/logo.png" width="32" height="32" alt=""><div><b id="phoneTo">Ugo's Pizza</b><small>en línea</small></div></div>
+          <div class="phone__chat"><div class="bub bub--in">¡Hola hermoso! 😎 ¿Qué te mandamos hoy?</div><div class="bub bub--out" id="phoneOut"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. Branches -->
+    <section class="branches" id="sucursales" aria-labelledby="brT">
+      <div class="wrap">
+        <div class="shead">
+          <p class="eyebrow">Sucursales</p>
+          <h2 class="display" id="brT">Nueve Ugo's en <span class="hl">la ciudad de los anillos</span></h2>
+          <p class="nowpill" id="nowPill"></p>
+        </div>
+        <div class="bgrid" id="bgrid"></div>
+        <div class="dband">
+          <img src="assets/img/ig-DfapG5MludI.webp" width="900" height="1125" alt="" loading="lazy">
+          <div><b>La Scoobyneta 🚌</b><p>El delivery de Ugo's. Pedí por WhatsApp al <a id="scoobyLink" href="#">76066200</a>. En noviembre, la Jamoneitor sale Bs 35 por La Scoobyneta (primeras 100 pizzas del día).</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14. Partner/feature spotlight: franchises -->
+    <section class="pale" id="pale">
+      <div class="wrap pale__grid">
+        <img src="assets/img/ugo-heroe.webp" width="1100" height="655" alt="Ugo, el súper héroe de la pizza, volando con una caja" loading="lazy">
+        <div>
+          <p class="eyebrow">Franquicias</p>
+          <h2 class="display">¿Querés tu propia <span class="hl">sucursal</span>?</h2>
+          <p class="sub">Somos una cadena 100% boliviana. Conocé la ficha técnica y escribinos desde la página de franquicias.</p>
+          <a class="btn btn--dark btn--lg" href="https://ugospizzas.com/franquicias/" target="_blank" rel="noopener">Quiero una franquicia ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15. Story -->
+    <section class="story" id="historia" aria-labelledby="storyT">
+      <div class="wrap story__grid">
+        <div class="story__vid"><video muted playsinline loop preload="none" poster="assets/video/apagon.webp" data-src="assets/video/apagon.mp4" width="540" height="960"></video></div>
+        <div id="storyCopy"></div>
+      </div>
+    </section>
+
+    <!-- 16. Instagram feed -->
+    <section class="feed" id="instagram" aria-labelledby="feedT">
+      <div class="wrap">
+        <div class="feed__head">
+          <h2 class="display" id="feedT">Seguinos en <span class="hl">Instagram</span></h2>
+          <a class="btn btn--red" href="https://www.instagram.com/ugos_pizza/" target="_blank" rel="noopener">@ugos_pizza ↗</a>
+        </div>
+        <div class="fgrid" id="fgrid"></div>
+      </div>
+    </section>
+
+    <!-- 17. Jobs -->
+    <section class="jobs" id="trabajo">
+      <div class="wrap jobs__in">
+        <img src="assets/img/gafas.webp" width="1100" height="383" alt="" loading="lazy">
+        <div><b id="jobsT"></b><p id="jobsP"></p></div>
+        <a class="btn btn--dark" id="jobsBtn" target="_blank" rel="noopener" href="#">Escribinos →</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- 18. Footer -->
+  <footer class="ftr" id="footer">
+    <div class="checker" aria-hidden="true"></div>
+    <div class="ftr__dark">
+      <div class="wrap center">
+        <p class="ftr__bye">¡Nos vemos en Ugo's, hermoso!</p>
+        <button class="btn btn--red" data-open-chat>Ayuda ›</button>
+        <div class="fgroups" id="fgroups"></div>
+        <p class="ftr__meta" id="ftrMeta"></p>
+      </div>
+    </div>
+    <div class="ftr__bar">
+      <div class="wrap ftr__barin">
+        <a id="ftrTel" href="#">Bolivia · Pedidos <b>60007071</b></a>
+        <a class="brand" href="#top"><img src="assets/img/logo.png" width="40" height="40" alt=""><span class="brand__word">Ugo's Pizza</span></a>
+        <div class="socials">
+          <a href="https://www.instagram.com/ugos_pizza/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a id="ftrWa" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9c0 3 3 6 6 6l1-1.5-2-1-1 1c-1-.5-2-1.5-2.5-2.5l1-1-1-2z"/></svg></a>
+          <a id="ftrPhone" href="#" aria-label="Llamar"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 19. Cart drawer -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerT" hidden>
+    <div class="drawer__head"><h2 id="drawerT">Tu pedido</h2><button class="x" id="drawerX" aria-label="Cerrar">✕</button></div>
+    <div class="drawer__body" id="drawerBody"></div>
+    <div class="drawer__foot"><div class="total"><span>Total</span><b id="drawerTotal">Bs 0</b></div><a class="btn btn--mustard btn--block" href="#pedir" id="drawerGo">Continuar pedido →</a></div>
+  </aside>
+
+  <!-- 20. Assistant -->
+  <button class="fab" id="fab" data-open-chat aria-label="Abrir Ugo·IA, asistente de pedidos">
+    <img src="assets/img/logo.png" width="40" height="40" alt="">
+    <span><b>Ugo·IA</b><small>¿Te ayudo?</small></span><i class="dot"></i>
+  </button>
+  <section class="chat" id="chat" role="dialog" aria-modal="false" aria-labelledby="chatT" hidden>
+    <header class="chat__head">
+      <img src="assets/img/logo.png" width="40" height="40" alt="">
+      <div><b id="chatT">Ugo·IA</b><small><i class="dot"></i> Asistente de pedidos</small></div>
+      <button class="x" id="chatX" aria-label="Cerrar asistente">✕</button>
+    </header>
+    <div class="chat__log" id="chatLog" aria-live="polite"></div>
+    <div class="chat__chips" id="chatChips"></div>
+    <div class="vbar" id="vbar" hidden>
+      <svg class="eq" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>
+      <span id="vStatus">Tocá el micrófono y hablá</span>
+      <label class="switch"><input type="checkbox" id="handsFree"><span>Manos libres</span></label>
+    </div>
+    <form class="chat__form" id="chatForm">
+      <label class="vh" for="chatIn">Escribí tu mensaje</label>
+      <input id="chatIn" autocomplete="off" maxlength="600" placeholder="Pedí lo que quieras…">
+      <button type="button" class="mic" id="micBtn" aria-label="Hablar" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      <button class="send" aria-label="Enviar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-2-6z"/></svg></button>
+    </form>
+    <p class="chat__disc">Ugo·IA es una IA y puede equivocarse. Confirmá tu pedido por WhatsApp.</p>
+  </section>
+
+  <!-- 21. Mobile action bar -->
+  <div class="mbar" id="mbar">
+    <button class="mbar__ai" data-open-chat aria-label="Abrir Ugo·IA"><img src="assets/img/logo.png" width="36" height="36" alt=""></button>
+    <button class="mbar__cart" id="mbarCart" hidden></button>
+    <a class="btn btn--mustard" href="#pedir">Pedí por WhatsApp →</a>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
