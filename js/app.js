@@ -223,7 +223,7 @@
     const pad = (n) => String(n).padStart(2, "0");
     const idxOf = (p) => ((Math.round(p) % N) + N) % N;
     const wrapD = (d) => { d = ((d % N) + N) % N; return d > N / 2 ? d - N : d; };
-    let pos = 0, vel = 0, target = 0, mode = "idle", raf = 0, last = 0, shown = -1, lastTick = 0, geo = {}, hover = false, touched = false;
+    let intro = null, pos = 0, vel = 0, target = 0, mode = "idle", raf = 0, last = 0, shown = -1, lastTick = 0, geo = {}, hover = false, touched = false;
 
     wrap.innerHTML = allPizzas.map((p, i) => `<button class="pz" id="pz-${i}" data-i="${i}" tabindex="-1" role="option" aria-selected="false" aria-label="${esc(p.name)}, ${money(p.price)}"><img src="${esc(p.img)}" width="760" height="543" alt="" ${i > 2 && i < N - 2 ? 'loading="lazy"' : ""} draggable="false"></button>`).join("");
     const els = $$(".pz", wrap);
@@ -297,6 +297,10 @@
       if (mode === "spring") {
         for (let k = 0; k < 4; k++) { const h = dt / 4; const f = .00022 * (target - pos) - .028 * vel; vel += f * h; pos += vel * h; }
         if (Math.abs(target - pos) < .0008 && Math.abs(vel) < .00005) { pos = target; vel = 0; mode = "idle"; }
+      } else if (mode === "intro") {     // eased showcase lap; lands exactly where it started
+        const k = Math.min(1, (t - intro.t0) / intro.dur), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        const np = intro.from + (intro.to - intro.from) * e; vel = (np - pos) / Math.max(1, dt); pos = np;
+        if (k >= 1) { pos = target = intro.to; vel = 0; mode = "idle"; }
       } else if (mode === "free") {
         pos += vel * dt; vel *= Math.pow(.992, dt);
         if (Math.abs(vel) < .0025) settle(0);
@@ -443,10 +447,12 @@
     addEventListener("resize", measure);
     measure();
 
-    /* first time the table scrolls into view it whirls in from a few pizzas back and lands on #1 */
+    /* first time the table is on screen it does one showcase lap and lands back on the same pizza */
     if (!reduced && "IntersectionObserver" in window) {
-      pos = -4; vel = 0; render();
-      const io = new IntersectionObserver(([en]) => { if (!en.isIntersecting) return; io.disconnect(); setTimeout(() => { if (!touched && mode === "idle") to(0); }, 60); }, { threshold: .35 });
+      const io = new IntersectionObserver(([en]) => {
+        if (!en.isIntersecting) return; io.disconnect();
+        setTimeout(() => { if (touched || mode !== "idle") return; intro = { from: pos, to: pos + N, t0: performance.now(), dur: 2200 }; target = intro.to; mode = "intro"; kick(); }, 250);
+      }, { threshold: .45 });
       io.observe(table);
     }
     return { goTo: (id) => { const i = allPizzas.findIndex((p) => p.id === id); if (i >= 0) goTo(i); }, closeDetail, isOpen: () => !$("#pdetail").hidden };
