@@ -226,8 +226,17 @@ input, select, textarea { font: inherit; }
 .spin .eyebrow { color: var(--red); }
 .spin .hl { color: var(--mustard); }
 .spin__head { position: relative; z-index: 2; }
-.spin__stage { position: relative; display: grid; grid-template-columns: 5fr 7fr; align-items: center; gap: 24px; min-height: clamp(420px, 42vw, 580px); }
-.spin__copy { position: relative; z-index: 5; }
+.spin__stage { position: relative; display: grid; grid-template-columns: 5fr 7fr; grid-template-rows: auto auto; align-items: center; column-gap: 24px; min-height: clamp(420px, 42vw, 580px); }
+.spin__copy { position: relative; z-index: 5; grid-row: 1 / span 2; }
+.spin__copy.is-fast .spin__name { opacity: .55; filter: blur(.5px); transition: opacity .15s; }
+.spin__n span { margin-left: 8px; padding-left: 12px; border-left: 1px solid rgba(251,246,233,.25); color: var(--cream); opacity: .55; letter-spacing: .14em; text-transform: uppercase; }
+/* category chips */
+.spin__cats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.spin__cats button { font: 700 .74rem var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--cream); background: rgba(251,246,233,.06); border: 0; box-shadow: inset 0 0 0 1.5px rgba(251,246,233,.22); padding: .7em 1.15em; border-radius: 999px; cursor: pointer; transition: background .25s, color .25s, box-shadow .25s, transform .25s var(--ease); }
+.spin__cats button small { font-size: .9em; opacity: .55; margin-left: 2px; }
+.spin__cats button:hover { box-shadow: inset 0 0 0 1.5px var(--mustard); transform: translateY(-1px); }
+.spin__cats button.is-on { background: var(--mustard); color: var(--ink); box-shadow: none; }
+.spin__cats button.is-on small { opacity: .7; }
 .spin__n { font: 700 .82rem var(--font-body); letter-spacing: .18em; color: var(--red); display: flex; align-items: center; gap: 10px; }
 .spin__n i { width: 42px; height: 2px; background: currentColor; opacity: .6; }
 .spin__name { font-family: var(--font-display); font-weight: 400; font-size: clamp(3rem, 6vw, 5.6rem); line-height: .9; margin: 10px 0 14px; letter-spacing: .01em; }
@@ -241,8 +250,8 @@ input, select, textarea { font: inherit; }
 .spin__copy .anim { animation: spinTxt .55s var(--ease) both; }
 .spin__copy .anim:nth-child(2) { animation-delay: .04s; } .spin__copy .anim:nth-child(3) { animation-delay: .08s; }
 .spin__copy .anim:nth-child(4) { animation-delay: .12s; } .spin__copy .anim:nth-child(5) { animation-delay: .16s; }
-@keyframes spinTxt { from { opacity: 0; transform: translateY(18px); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: none; clip-path: inset(0 0 -20% 0); } }
-.spin__table { position: relative; z-index: 1; isolation: isolate; height: clamp(400px, 40vw, 560px); outline: none; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+@keyframes spinTxt { from { opacity: 0; transform: translate(calc(var(--dir, 1) * 34px), calc((1 - var(--dir, 1) * var(--dir, 1)) * 18px)); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: none; clip-path: inset(0 0 -20% 0); } }
+.spin__table { grid-column: 2; position: relative; z-index: 1; isolation: isolate; height: clamp(400px, 40vw, 560px); outline: none; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
 .spin__table.is-drag { cursor: grabbing; }
 .spin__table:focus-visible { outline: 3px solid var(--mustard); outline-offset: 6px; border-radius: 24px; }
 .board { position: absolute; left: 50%; top: 40%; width: 0; height: 0; perspective: 1400px; }
@@ -260,8 +269,36 @@ input, select, textarea { font: inherit; }
 .pz { position: absolute; left: 0; top: 0; width: var(--pw, 420px); transform-origin: 50% 80%; will-change: transform, filter; pointer-events: auto; background: none; border: 0; padding: 0; }
 .pz img { width: 100%; height: auto; filter: drop-shadow(0 26px 22px rgba(0,0,0,.55)); pointer-events: none; -webkit-user-drag: none; }
 .pz.is-front { cursor: pointer; }
-.spin__nav { position: absolute; right: clamp(20px, 4vw, 48px); bottom: 0; z-index: 6; display: flex; align-items: center; gap: 14px; }
-.spin__count { font: 700 .9rem var(--font-body); letter-spacing: .16em; min-width: 72px; text-align: center; }
+.spin__table.is-drag .pz { cursor: grabbing; }
+.pz.is-pop img { animation: pzPop .5s var(--ease); }
+@keyframes pzPop { 0% { transform: none; } 35% { transform: scale(1.07) translateY(-14px) rotate(-2deg); } 100% { transform: none; } }
+/* warm light + steam under the pizza at the front */
+.spin__glow { position: absolute; transform: translate(-50%, -62%); pointer-events: none; z-index: 0; transition: opacity .2s; }
+.spin__glow::before { content: ""; position: absolute; inset: -30% -10%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,200,90,.42), rgba(255,66,0,.14) 55%, transparent); filter: blur(6px); }
+.spin__glow i { position: absolute; bottom: 120%; left: 50%; width: 46px; height: 110px; margin-left: -23px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,245,225,.32), transparent); filter: blur(10px); opacity: 0; animation: steam 3.6s ease-in infinite; z-index: 300; }
+.spin__glow i:nth-child(2) { left: 38%; animation-delay: 1.2s; } .spin__glow i:nth-child(3) { left: 62%; animation-delay: 2.4s; }
+@keyframes steam { 0% { opacity: 0; transform: translateY(40px) scaleX(.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(-70px) scaleX(1.4) rotate(8deg); } }
+/* "drag me" hint, gone after the first interaction */
+.spin__hint { position: absolute; left: 50%; bottom: 4%; z-index: 400; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: .55em 1.1em .55em .8em; border-radius: 999px; background: rgba(20,10,7,.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); box-shadow: inset 0 0 0 1px rgba(251,246,233,.15); font: 700 .72rem var(--font-body); letter-spacing: .14em; text-transform: uppercase; pointer-events: none; transition: opacity .4s, transform .4s var(--ease); }
+.spin__hand { font-size: 1.15rem; display: inline-block; animation: hand 1.8s var(--ease) infinite; }
+@keyframes hand { 0%, 100% { transform: translateX(-8px) rotate(-12deg); } 50% { transform: translateX(10px) rotate(10deg); } }
+.spin__hint.is-gone { opacity: 0; transform: translate(-50%, 10px); }
+.spin__nav { grid-column: 2; position: relative; z-index: 6; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; margin-top: 6px; }
+.spin__nav .rbtn { position: relative; color: var(--cream); flex: none; }
+.spin__nav .rbtn::after { content: attr(data-peek); position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translate(-50%, 6px); white-space: nowrap; font: 400 1.05rem var(--font-display); letter-spacing: .04em; color: var(--ink); background: var(--mustard); padding: .25em .7em; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .25s var(--ease); }
+.spin__nav .rbtn:hover::after, .spin__nav .rbtn:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+.spin__nav .rbtn:active { transform: scale(.92); }
+.spin__count { grid-column: 1 / -1; justify-self: center; font: 700 .78rem var(--font-body); letter-spacing: .18em; opacity: .6; margin-top: -4px; }
+.spin__count b { color: var(--mustard); opacity: 1; }
+/* the name dial: a radio-tuner strip that slides with the board */
+.spin__dial { position: relative; height: 64px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent); mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent); }
+.dial__track { position: absolute; inset: 0 0 14px; }
+.dial__n { position: absolute; left: 50%; top: 50%; margin-top: -.62em; white-space: nowrap; font: 400 1.35rem/1.2 var(--font-display); letter-spacing: .04em; color: var(--cream); background: none; border: 0; padding: 0 .2em; cursor: pointer; will-change: transform; transition: color .2s; }
+.dial__n:hover { color: var(--mustard); }
+.dial__n.is-on { color: var(--mustard); }
+.dial__notch { position: absolute; left: 50%; bottom: 4px; width: 2px; height: 12px; margin-left: -1px; background: var(--mustard); border-radius: 2px; }
+.dial__bar { position: absolute; left: 22%; right: 22%; bottom: 9px; height: 2px; background: rgba(251,246,233,.15); border-radius: 2px; overflow: hidden; }
+.dial__bar i { display: block; height: 100%; background: var(--red); transform-origin: 0 50%; }
 .spin__all { display: block; width: max-content; margin: 30px auto 0; color: var(--cream); opacity: .7; font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; text-decoration: none; font-weight: 700; }
 .spin__all:hover { opacity: 1; color: var(--mustard); }
 .pdetail { position: fixed; top: 0; right: 0; bottom: 0; z-index: 80; width: min(520px, 100%); background: var(--wine-2); color: var(--cream); padding: 64px clamp(24px, 4vw, 44px) 32px; overflow: auto; box-shadow: -30px 0 60px rgba(0,0,0,.5); animation: pdIn .45s var(--ease); }
@@ -593,11 +630,17 @@ body.chat-open .toast { bottom: 190px; }
   .hero__stack { overflow: hidden; }
   .offers { padding-top: 60px; }
   .spin__stage { grid-template-columns: 1fr; min-height: 0; }
-  .spin__copy { order: 2; text-align: center; }
+  .spin__copy { order: 3; grid-row: auto; text-align: center; margin-top: 18px; }
+  .spin__cats { flex-wrap: nowrap; overflow-x: auto; margin: 18px -20px 0; padding: 2px 20px; scrollbar-width: none; }
+  .spin__cats::-webkit-scrollbar { display: none; }
+  .spin__cats button { flex: none; }
+  .spin__table, .spin__nav { grid-column: 1; }
+  .spin__nav .rbtn::after { display: none; }
+  .dial__n { font-size: 1.15rem; }
   .spin__copy .ichips, .spin__buy, .spin__n, .spin__badges { justify-content: center; }
   .spin__desc { margin-left: auto; margin-right: auto; }
   .spin__table { order: 1; height: clamp(320px, 86vw, 460px); margin: 0 -20px; }
-  .spin__nav { position: static; order: 3; justify-content: center; margin-top: 18px; }
+  .spin__nav { order: 2; margin-top: -6px; gap: 8px; }
   .yapa__grid, .pale__grid, .story__grid { grid-template-columns: 1fr; }
   .story__vid { margin: 0 auto; width: 70%; }
   .mlist { grid-template-columns: 1fr; }

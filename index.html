@@ -115,7 +115,8 @@
       <div class="wrap spin__head">
         <p class="eyebrow">La carta gira</p>
         <h2 class="display" id="spinT">Girá la mesa, <span class="hl">elegí tu pizza</span></h2>
-        <p class="sub">Arrastrá, deslizá o usá las flechas. Tocá la pizza para ver qué lleva y sumarla al pedido.</p>
+        <p class="sub">Arrastrá y soltá con fuerza para hacerla girar. Tocá la pizza del frente para ver qué lleva y sumarla al pedido.</p>
+        <div class="spin__cats" id="spinCats" role="group" aria-label="Saltar a una categoría"></div>
       </div>
       <div class="spin__stage wrap" id="spinStage">
         <div class="spin__copy" id="spinCopy" aria-live="polite"></div>
@@ -127,12 +128,15 @@
               </svg>
             </div>
           </div>
+          <div class="spin__glow" id="spinGlow" aria-hidden="true"><i></i><i></i><i></i></div>
           <div class="spin__pizzas" id="spinPizzas"></div>
+          <div class="spin__hint" id="spinHint" aria-hidden="true"><span class="spin__hand">👆</span>Arrastrá para girar</div>
         </div>
         <div class="spin__nav">
           <button class="rbtn" id="spinPrev" aria-label="Pizza anterior">‹</button>
-          <span class="spin__count" id="spinCount">01 / 18</span>
+          <div class="spin__dial" id="spinDial" aria-hidden="true"></div>
           <button class="rbtn" id="spinNext" aria-label="Pizza siguiente">›</button>
+          <span class="spin__count" id="spinCount" aria-hidden="true">01 / 18</span>
         </div>
       </div>
       <a class="spin__all" href="#menu">Ver la carta entera ↓</a>

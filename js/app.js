@@ -210,51 +210,114 @@
     w.innerHTML = `<div class="wrap"><div class="shead"><p class="eyebrow">Promos de la semana</p><h2 class="display">Cada día, <span class="hl">su promo</span></h2></div><div class="wgrid">${list.map((p) => `<article class="wcard${p.day === today.dow ? " is-today" : ""}"><b>${days[p.day]}</b><h3>${esc(p.title)}</h3><p>${esc(p.desc)}</p><span>${money(p.price)}</span></article>`).join("")}</div></div>`;
   }
 
-  /* ====================== SPIN: la carta gira ====================== */
+  /* ====================== SPIN: la carta gira ======================
+   * A lazy-susan you can flick. Position `pos` is measured in pizzas (0..N, wraps).
+   *  - drag: pos follows the finger 1:1; release keeps the flick's momentum and a spring lands
+   *    it exactly on the pizza where that momentum would have stopped (so a hard flick spins several).
+   *  - wheel / trackpad (horizontal), arrows, Home/End, category chips, name dial, prev/next.
+   *  - everything visual (pizzas, board, name dial, progress, glow) is drawn from `pos` each frame. */
   const Spin = (function () {
     const table = $("#spinTable"), wrap = $("#spinPizzas"), disc = $("#boardDisc"), copy = $("#spinCopy");
+    const dial = $("#spinDial"), cats = $("#spinCats"), glow = $("#spinGlow"), hint = $("#spinHint");
     const N = allPizzas.length; const STEP = 46 * Math.PI / 180; const TILT = 64 * Math.PI / 180;
-    let pos = 0, target = 0, raf = 0, shown = -1, geo = {};
-    wrap.innerHTML = allPizzas.map((p, i) => `<button class="pz" data-i="${i}" tabindex="-1" aria-label="${esc(p.name)}"><img src="${esc(p.img)}" width="760" height="543" alt="" ${i > 2 && i < N - 2 ? 'loading="lazy"' : ""} draggable="false"></button>`).join("");
+    const pad = (n) => String(n).padStart(2, "0");
+    const idxOf = (p) => ((Math.round(p) % N) + N) % N;
+    const wrapD = (d) => { d = ((d % N) + N) % N; return d > N / 2 ? d - N : d; };
+    let pos = 0, vel = 0, target = 0, mode = "idle", raf = 0, last = 0, shown = -1, lastTick = 0, geo = {}, hover = false, touched = false;
+
+    wrap.innerHTML = allPizzas.map((p, i) => `<button class="pz" id="pz-${i}" data-i="${i}" tabindex="-1" role="option" aria-selected="false" aria-label="${esc(p.name)}, ${money(p.price)}"><img src="${esc(p.img)}" width="760" height="543" alt="" ${i > 2 && i < N - 2 ? 'loading="lazy"' : ""} draggable="false"></button>`).join("");
     const els = $$(".pz", wrap);
     els.forEach((el) => { const img = $("img", el); const set = () => { el._ar = img.naturalHeight / img.naturalWidth || .71; render(); }; img.complete ? set() : img.addEventListener("load", set); });
+
+    /* name dial: every pizza name on a strip that slides with the board */
+    dial.innerHTML = `<div class="dial__track">${allPizzas.map((p, i) => `<button class="dial__n" data-i="${i}" tabindex="-1">${esc(p.name)}</button>`).join("")}</div><span class="dial__notch" aria-hidden="true"></span><div class="dial__bar"><i id="spinProg"></i></div>`;
+    const names = $$(".dial__n", dial); const prog = $("#spinProg");
+
+    /* category chips: jump to the category; tap again to walk through it */
+    const groups = [...U.menu.map((c) => ({ id: c.id, name: c.name, test: (p) => p.cat === c.id })), { id: "veg", name: "Sin carne", test: (p) => !!p.veg }]
+      .map((g) => ({ ...g, list: allPizzas.map((p, i) => (g.test(p) ? i : -1)).filter((i) => i >= 0) })).filter((g) => g.list.length);
+    cats.innerHTML = groups.map((g) => `<button type="button" data-g="${g.id}" aria-pressed="false">${esc(g.name)} <small>${g.list.length}</small></button>`).join("");
+    cats.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-g]"); if (!b) return; interacted();
+      const g = groups.find((x) => x.id === b.dataset.g); const cur = current(); const at = g.list.indexOf(cur);
+      goTo(at >= 0 ? g.list[(at + 1) % g.list.length] : g.list.reduce((best, i) => (Math.abs(wrapD(i - cur)) < Math.abs(wrapD(best - cur)) ? i : best), g.list[0]));
+    });
+
     function measure() {
       const W = table.clientWidth, H = table.clientHeight, m = W < 640;
       const R = m ? W * .62 : Math.min(W * .5, H * .95);
-      geo = { W, H, R, ry: R * Math.cos(TILT), cx: W / 2, cy: H * (m ? .36 : .38), pw: m ? W * .66 : Math.min(W * .58, H * 1.0) };
-      const bd = R * 2.15;
-      disc.style.setProperty("--bd", bd + "px"); disc.parentElement.style.top = geo.cy + geo.ry * .18 + "px";
+      geo = { W, H, R, m, ry: R * Math.cos(TILT), cx: W / 2, cy: H * (m ? .36 : .38), pw: m ? W * .66 : Math.min(W * .58, H * 1.0), per: R * Math.sin(STEP) || 200, gap: m ? 128 : 165 };
+      disc.style.setProperty("--bd", R * 2.15 + "px"); disc.parentElement.style.top = geo.cy + geo.ry * .18 + "px";
       wrap.style.setProperty("--pw", geo.pw + "px");
+      glow.style.cssText = `left:${geo.cx}px;top:${geo.cy + geo.ry}px;width:${geo.pw * 1.25}px;height:${geo.pw * .55}px`;
       render();
     }
-    const wrapD = (d) => { d = ((d % N) + N) % N; return d > N / 2 ? d - N : d; };
+
     function render() {
-      const { R, ry, cx, cy, pw } = geo;
+      const { R, ry, cx, cy, pw, gap } = geo; if (!R) return;
+      const speed = Math.min(1, Math.abs(vel) * 60);           // 0 = still, 1 = whirling
       els.forEach((el, i) => {
         const th = wrapD(i - pos) * STEP; const a = Math.abs(th);
-        if (a > 2.1) { el.style.visibility = "hidden"; return; }
-        el.style.visibility = "visible";
-        const c = Math.cos(th), depth = (1 + c) / 2, s = .34 + .66 * Math.pow(depth, 1.7);
-        const x = cx + R * Math.sin(th), y = cy + ry * c; const h = pw * (el._ar || .71);
-        el.style.transform = `translate(${x - pw / 2}px, ${y - h * .8}px) scale(${s})`;
+        if (a > 2.1) { if (el._v !== 0) { el.style.visibility = "hidden"; el._v = 0; } return; }
+        if (el._v !== 1) { el.style.visibility = "visible"; el._v = 1; }
+        const c = Math.cos(th), depth = (1 + c) / 2, front = Math.max(0, 1 - a / (STEP * .6));
+        const lift = front * (hover ? 1 : 0) * (1 - speed);
+        const s = (.34 + .66 * Math.pow(depth, 1.7)) * (1 + .05 * front * (1 - speed) + .04 * lift);
+        const x = cx + R * Math.sin(th), y = cy + ry * c - front * (1 - speed) * 10 - lift * 12; const h = pw * (el._ar || .71);
+        el.style.transform = `translate(${x - pw / 2}px, ${y - h * .8}px) scale(${s}) rotate(${(-Math.sin(th) * 4 * speed).toFixed(2)}deg)`;
         el.style.zIndex = 100 + Math.round(depth * 100);
-        el.style.filter = `brightness(${.3 + .7 * depth * depth})`;
+        el.style.filter = `brightness(${(.28 + .72 * depth * depth).toFixed(3)}) saturate(${(.7 + .3 * depth).toFixed(3)})${speed > .15 ? ` blur(${(speed * 2.2 * (1 - front * .6)).toFixed(2)}px)` : ""}`;
         el.style.opacity = Math.max(0, Math.min(1, (2.1 - a) / .45));
-        el.classList.toggle("is-front", a < STEP / 2);
+        const isF = a < STEP / 2; if (el._f !== isF) { el._f = isF; el.classList.toggle("is-front", isF); el.setAttribute("aria-selected", isF); }
       });
       disc.style.setProperty("--rot", (-pos * 46) + "deg");
-      const idx = ((Math.round(pos) % N) + N) % N;
-      if (idx !== shown) { shown = idx; showCopy(idx); }
+      glow.style.opacity = (1 - speed * .8) * (.75 + .25 * (1 - Math.abs(wrapD(pos - Math.round(pos))) * 2));
+      names.forEach((el, i) => {
+        const d = wrapD(i - pos), a = Math.abs(d);
+        if (a > 3.2) { if (el._v !== 0) { el.style.visibility = "hidden"; el._v = 0; } return; }
+        if (el._v !== 1) { el.style.visibility = "visible"; el._v = 1; }
+        el.style.transform = `translateX(${d * gap}px) translateX(-50%) scale(${(1 - Math.min(a, 2) * .16).toFixed(3)})`;
+        el.style.opacity = Math.max(0, 1 - a * .34).toFixed(3);
+        const on = a < .5; if (el._on !== on) { el._on = on; el.classList.toggle("is-on", on); }
+      });
+      prog.style.transform = `scaleX(${((((pos % N) + N) % N) + 1) / N})`;
+      table.style.setProperty("--spd", speed.toFixed(3));
+      const idx = idxOf(pos);
+      if (idx !== shown) {
+        const dir = shown < 0 ? 1 : Math.sign(wrapD(idx - shown)) || 1; const prev = shown; shown = idx;
+        table.setAttribute("aria-activedescendant", "pz-" + idx);
+        showCopy(idx, dir, speed > .35, prev);
+        if (mode === "drag" && navigator.vibrate && performance.now() - lastTick > 60) { try { navigator.vibrate(4); } catch (er) { /* */ } lastTick = performance.now(); }
+      } else if (copy.classList.contains("is-fast") && speed < .35) showCopy(idx, 1, false, -1, true);
     }
-    function tick() {
-      const d = target - pos;
-      if (Math.abs(d) < .001 || reduced) { pos = target; render(); raf = 0; return; }
-      pos += d * .12; render(); raf = requestAnimationFrame(tick);
+
+    /* physics loop: "free" = momentum + friction (wheel), "spring" = damped spring to an integer */
+    function loop(t) {
+      const dt = Math.min(40, t - (last || t)); last = t;
+      if (mode === "spring") {
+        for (let k = 0; k < 4; k++) { const h = dt / 4; const f = .00022 * (target - pos) - .028 * vel; vel += f * h; pos += vel * h; }
+        if (Math.abs(target - pos) < .0008 && Math.abs(vel) < .00005) { pos = target; vel = 0; mode = "idle"; }
+      } else if (mode === "free") {
+        pos += vel * dt; vel *= Math.pow(.992, dt);
+        if (Math.abs(vel) < .0025) settle(0);
+      }
+      render();
+      if (mode === "idle" || mode === "drag") { raf = 0; last = 0; return; }
+      raf = requestAnimationFrame(loop);
     }
-    function to(t) { target = t; if (!raf) raf = requestAnimationFrame(tick); }
-    function step(n) { to(Math.round(target) + n); }
-    function current() { return ((Math.round(target) % N) + N) % N; }
-    function goTo(i) { const d = wrapD(i - Math.round(target)); to(Math.round(target) + d); }
+    function kick() { if (!raf) { last = 0; raf = requestAnimationFrame(loop); } }
+    function to(t) {
+      target = t;
+      if (reduced) { pos = t; vel = 0; mode = "idle"; render(); return; }
+      mode = "spring"; kick();
+    }
+    /* land where the current momentum would naturally stop */
+    function settle(boost = 1) { to(Math.round(pos + vel * 260 * boost)); }
+    function step(n) { interacted(); to((mode === "spring" ? target : Math.round(pos)) + n); }
+    function current() { return idxOf(mode === "spring" ? target : pos); }
+    function goTo(i) { const base = mode === "spring" ? target : Math.round(pos); to(base + wrapD(i - idxOf(base))); }
+
+    function interacted() { if (touched) return; touched = true; hint.classList.add("is-gone"); }
 
     function ingredients(desc) {
       return desc.replace(/\.$/, "").split(/,\s*|\s+y\s+/).map((s) => s.trim()).filter(Boolean)
@@ -264,16 +327,35 @@
       return [p.star && `<span class="badge badge--star">La más vendida</span>`, p.signature && `<span class="badge">De la casa</span>`, p.veg && `<span class="badge badge--veg">Sin carne</span>`, p.hot && `<span class="badge">Nueva</span>`,
         yapaOn && p.id === U.yapa.ref && `<span class="badge">${money(U.yapa.price)} por Scoobyneta</span>`].filter(Boolean).join("");
     }
-    function showCopy(i) {
+    let priceRaf = 0, shownPrice = null;
+    function rollPrice(el, to) {
+      cancelAnimationFrame(priceRaf); const from = shownPrice == null ? to : shownPrice; shownPrice = to;
+      if (reduced || from === to) { el.textContent = to; return; }
+      const t0 = performance.now();
+      const f = (t) => { const k = Math.min(1, (t - t0) / 420), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) priceRaf = requestAnimationFrame(f); };
+      el.textContent = from; priceRaf = requestAnimationFrame(f);
+    }
+    function showCopy(i, dir, fast, prev, upgrade) {
       const p = allPizzas[i]; const ing = ingredients(p.desc);
+      $("#spinCount").innerHTML = `<b>${pad(i + 1)}</b> / ${pad(N)}`;
+      const pn = allPizzas[(i - 1 + N) % N].name, nn = allPizzas[(i + 1) % N].name;
+      $("#spinPrev").dataset.peek = pn; $("#spinPrev").setAttribute("aria-label", `Pizza anterior: ${pn}`);
+      $("#spinNext").dataset.peek = nn; $("#spinNext").setAttribute("aria-label", `Pizza siguiente: ${nn}`);
+      $$("[data-g]", cats).forEach((b) => { const g = groups.find((x) => x.id === b.dataset.g); const on = g.test(p); b.setAttribute("aria-pressed", on); b.classList.toggle("is-on", on); });
+      if (fast) {             // whirling past: only swap the name, skip the choreography
+        copy.classList.add("is-fast");
+        const nm = $(".spin__name", copy); if (nm) { nm.textContent = p.name; return; }
+      }
+      copy.classList.remove("is-fast");
+      copy.style.setProperty("--dir", upgrade ? 0 : dir);
       copy.innerHTML = `
-        <p class="spin__n anim">${String(i + 1).padStart(2, "0")} <i></i> ${String(N).padStart(2, "0")}</p>
+        <p class="spin__n anim">${pad(i + 1)} <i></i> ${pad(N)} <span>${esc((U.menu.find((c) => c.id === p.cat) || {}).name || "")}</span></p>
         <div class="spin__badges anim">${badges(p)}</div>
         <h3 class="spin__name anim">${esc(p.name)}</h3>
         <p class="spin__desc anim">${esc(p.desc)}</p>
         <ul class="ichips anim">${ing.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
-        <div class="spin__buy anim"><span class="spin__price"><small>Bs</small>${p.price}</span><button class="btn btn--red" data-detail="${i}">Ver y pedir</button><button class="plus" data-add="${esc(p.id)}" aria-label="Sumar ${esc(p.name)} al pedido">+</button></div>`;
-      $("#spinCount").textContent = `${String(i + 1).padStart(2, "0")} / ${N}`;
+        <div class="spin__buy anim"><span class="spin__price"><small>Bs</small><span class="spin__pv">${p.price}</span></span><button class="btn btn--red" data-detail="${i}">Ver y pedir</button><button class="plus" data-add="${esc(p.id)}" aria-label="Sumar ${esc(p.name)} al pedido">+</button></div>`;
+      rollPrice($(".spin__pv", copy), p.price);
     }
 
     /* detail panel */
@@ -284,7 +366,7 @@
       const promo = yapaOn && U.yapa.ref === p.id;
       $("#pdBody").innerHTML = `
         <img class="pd__img" src="${esc(p.img)}" width="760" height="543" alt="Pizza ${esc(p.name)}">
-        <p class="pd__n">${String(i + 1).padStart(2, "0")} / ${N}</p>
+        <p class="pd__n">${pad(i + 1)} / ${N}</p>
         <h3 id="pdName">${esc(p.name)}</h3>
         <p class="pd__note">${esc(p.desc)}</p>
         <p class="pd__lbl">Ingredientes</p>
@@ -303,39 +385,70 @@
     $("#pdX").addEventListener("click", closeDetail); $("#pdScrim").addEventListener("click", closeDetail);
     $("#pdetail").addEventListener("click", (e) => { if (e.target.closest("[data-close-pd]") || e.target.closest("[data-add]")) setTimeout(closeDetail, 50); });
     copy.addEventListener("click", (e) => { const d = e.target.closest("[data-detail]"); if (d) openDetail(Number(d.dataset.detail)); });
+    /* "+" pops the front pizza so the add feels physical */
+    copy.addEventListener("click", (e) => { if (!e.target.closest("[data-add]") || reduced) return; const f = els[current()]; f.classList.remove("is-pop"); void f.offsetWidth; f.classList.add("is-pop"); });
 
-    /* input: drag / swipe / keys */
+    /* input: drag / flick */
     let drag = null;
     table.addEventListener("pointerdown", (e) => {
       if (e.button) return;
-      drag = { x: e.clientX, y: e.clientY, p: pos, t: performance.now(), v: 0, lx: e.clientX, moved: false, id: e.pointerId, tgt: e.target.closest(".pz") };
-      cancelAnimationFrame(raf); raf = 0; target = pos;
+      drag = { x: e.clientX, y: e.clientY, p: pos, moved: false, id: e.pointerId, tgt: e.target.closest(".pz"), s: [{ x: e.clientX, t: performance.now() }] };
+      if (mode !== "idle") { cancelAnimationFrame(raf); raf = 0; mode = "idle"; drag.p = pos; drag.caught = Math.abs(vel) > .002; vel = 0; }
     });
     addEventListener("pointermove", (e) => {
       if (!drag || e.pointerId !== drag.id) return;
       const dx = e.clientX - drag.x;
-      if (!drag.moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(e.clientY - drag.y)) { drag.moved = true; table.classList.add("is-drag"); try { table.setPointerCapture(e.pointerId); } catch (er) { /* */ } }
+      if (!drag.moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(e.clientY - drag.y)) { drag.moved = true; mode = "drag"; interacted(); table.classList.add("is-drag"); try { table.setPointerCapture(e.pointerId); } catch (er) { /* */ } }
       if (!drag.moved) return;
-      const per = geo.R * Math.sin(STEP) || 200;
-      pos = drag.p - dx / per; target = pos; render();
-      const t = performance.now(); drag.v = (e.clientX - drag.lx) / Math.max(1, t - drag.t); drag.lx = e.clientX; drag.t = t;
+      const t = performance.now(); drag.s.push({ x: e.clientX, t }); while (drag.s.length > 2 && t - drag.s[0].t > 90) drag.s.shift();
+      const np = drag.p - dx / geo.per; vel = (np - pos) / Math.max(8, t - (drag.lt || t - 16)); drag.lt = t; pos = np; render();
     });
     const end = (e) => {
       if (!drag || (e && e.pointerId !== drag.id)) return;
       table.classList.remove("is-drag");
-      if (drag.moved) { const per = geo.R * Math.sin(STEP) || 200; to(Math.round(pos - drag.v * 160 / per)); }
-      else if (drag.tgt) { const i = Number(drag.tgt.dataset.i); if (drag.tgt.classList.contains("is-front")) openDetail(i); else goTo(i); }
+      if (drag.moved) {
+        const a = drag.s[0], b = drag.s[drag.s.length - 1]; const dt = b.t - a.t;
+        vel = dt > 0 && performance.now() - b.t < 80 ? -(b.x - a.x) / dt / geo.per : 0;
+        vel = Math.max(-.03, Math.min(.03, vel)); mode = "idle"; settle();
+      } else if (drag.caught) settle(0);
+      else if (drag.tgt) { interacted(); const i = Number(drag.tgt.dataset.i); if (drag.tgt.classList.contains("is-front")) openDetail(i); else goTo(i); }
       drag = null;
     };
     addEventListener("pointerup", end); addEventListener("pointercancel", end);
+    table.addEventListener("pointerover", (e) => { const h = !!(e.target.closest(".pz.is-front")) && e.pointerType === "mouse"; if (h !== hover) { hover = h; if (mode === "idle") render(); } });
+    table.addEventListener("pointerleave", () => { if (hover) { hover = false; if (mode === "idle") render(); } });
+
+    /* trackpad / shift+wheel: sideways gestures spin it, vertical scroll is left to the page */
+    let wheelT = 0;
+    table.addEventListener("wheel", (e) => {
+      const dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.shiftKey ? e.deltaY : 0; if (!dx) return;
+      e.preventDefault(); interacted();
+      const mult = e.deltaMode === 1 ? 30 : 1; const d = dx * mult / geo.per;
+      if (reduced) { clearTimeout(wheelT); wheelT = setTimeout(() => step(Math.sign(d)), 60); return; }
+      pos += d * .9; vel = vel * .5 + (d / 16) * .5; mode = "free"; kick();
+      clearTimeout(wheelT); wheelT = setTimeout(() => settle(.6), 120);
+    }, { passive: false });
+
     table.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowRight") { e.preventDefault(); step(1); } else if (e.key === "ArrowLeft") { e.preventDefault(); step(-1); }
-      else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDetail(current()); }
+      const k = e.key;
+      if (k === "ArrowRight" || k === "ArrowDown") { e.preventDefault(); step(1); }
+      else if (k === "ArrowLeft" || k === "ArrowUp") { e.preventDefault(); step(-1); }
+      else if (k === "PageDown") { e.preventDefault(); step(5); } else if (k === "PageUp") { e.preventDefault(); step(-5); }
+      else if (k === "Home") { e.preventDefault(); interacted(); goTo(0); } else if (k === "End") { e.preventDefault(); interacted(); goTo(N - 1); }
+      else if (k === "Enter" || k === " ") { e.preventDefault(); openDetail(current()); }
     });
+    dial.addEventListener("click", (e) => { const b = e.target.closest(".dial__n"); if (b) { interacted(); goTo(Number(b.dataset.i)); } });
     $("#spinPrev").addEventListener("click", () => step(-1));
     $("#spinNext").addEventListener("click", () => step(1));
     addEventListener("resize", measure);
     measure();
+
+    /* first time the table scrolls into view it whirls in from a few pizzas back and lands on #1 */
+    if (!reduced && "IntersectionObserver" in window) {
+      pos = -4; vel = 0; render();
+      const io = new IntersectionObserver(([en]) => { if (!en.isIntersecting) return; io.disconnect(); setTimeout(() => { if (!touched && mode === "idle") to(0); }, 60); }, { threshold: .35 });
+      io.observe(table);
+    }
     return { goTo: (id) => { const i = allPizzas.findIndex((p) => p.id === id); if (i >= 0) goTo(i); }, closeDetail, isOpen: () => !$("#pdetail").hidden };
   })();
 
