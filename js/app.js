@@ -181,7 +181,7 @@
         <div class="bcard__links"><a href="${esc(b.maps)}" target="_blank" rel="noopener">Cómo llegar ↗</a><a href="${esc(U.waUrl(b.whatsapp, `¡Hola Ugo's ${b.name}! 😎`))}" target="_blank" rel="noopener">WhatsApp ${esc(b.whatsapp.slice(3))}</a></div>
       </article>`).join("");
     const keep = (sel) => { const el = $(sel); const v = el.value; el.innerHTML = branchOptions(sel === "#fBranch"); if (v) el.value = v; };
-    keep("#obBranch"); keep("#fBranch");
+    keep("#obBranch"); keep("#fBranch"); renderBranchCards();
     observeReveal();
   }
   renderStatus(); setInterval(renderStatus, 60000);
@@ -193,7 +193,7 @@
     const intent = $("input[name=ob-intent]:checked").value;
     $(`#funnel input[name=intent][value=${intent}]`).checked = true;
     $("#fBranch").value = $("#obBranch").value;
-    gotoStep(2); $("#pedir").scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+    gotoStep(2, { focus: false }); $("#pedir").scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
   });
 
   /* ====================== RAILS ====================== */
@@ -537,59 +537,177 @@
   $("#ftrTel").href = `tel:+${U.config.callCenter}`; $("#ftrPhone").href = `tel:+${U.config.callCenter}`;
   $("#ftrWa").href = U.waUrl(U.config.callCenter, "¡Hola Ugo's! 😎 Quiero hacer un pedido");
 
-  /* ====================== FUNNEL ====================== */
-  const F = $("#funnel"); let fstep = 1;
-  $("#stepsBar").innerHTML = "<li></li><li></li><li></li><li></li>";
-  $("#fPicker").innerHTML = Object.values(CAT).map((it) => `<button type="button" data-add="${esc(it.id)}">${esc(it.name)}<b>${money(it.price)}</b></button>`).join("");
+  /* ====================== FUNNEL ======================
+   * 4 steps → one WhatsApp message (U.buildMessage, same text the assistant sends).
+   * The hidden <select id=fBranch> stays the source of truth (the order box and renderStatus write it);
+   * the branch cards are just a nicer face for it. */
+  const F = $("#funnel"); let fstep = 1, fmax = 1, geoPin = "";
+  const STEPS = ["Servicio", "Tu pedido", "Tus datos", "Enviar"];
+  $("#stepsBar").innerHTML = STEPS.map((s, i) => `<li><button type="button" data-goto="${i + 1}"><span class="steps__n">${i + 1}</span><span class="steps__t">${s}</span></button></li>`).join("") + `<li class="steps__fill" aria-hidden="true"></li>`;
   const val = (n) => { const el = F.elements[n]; return el ? (el.value || "").trim() : ""; };
   const intent = () => F.querySelector("input[name=intent]:checked").value;
-  function renderFunnelCart() {
-    const { lines, total } = U.priceCart(cart, today.date);
-    $("#fCart").innerHTML = lines.length ? lines.map((l) => `<div class="fcart__row"><span>${l.qty}× ${esc(l.name)}</span><span class="qty"><button type="button" data-q="-1" data-id="${esc(l.id)}" aria-label="Quitar uno">−</button><b>${money(l.sub)}</b><button type="button" data-q="1" data-id="${esc(l.id)}" aria-label="Agregar uno">+</button></span></div>`).join("") + `<div class="fcart__row"><b>Total</b><b>${money(total)}</b></div>`
-      : `<p class="fcart__empty">Todavía no elegiste nada. Sumá pizzas o combos abajo 👇</p>`;
-    if (cart[U.yapa && U.yapa.id] && intent() === "delivery" && $("#fBranch").value !== U.delivery.id) $("#fBranch").value = U.delivery.id;
-    updatePreview();
+  const isOrder = () => ["delivery", "pickup"].includes(intent());
+
+  /* picker: visual cards by tab */
+  const PTABS = [{ id: "pizza", name: "Pizzas", ico: "🍕" }, { id: "combo", name: "Combos", ico: "🥤" }, { id: "promo", name: "Promo del mes", ico: "🔥" }]
+    .filter((t) => Object.values(CAT).some((it) => it.kind === t.id));
+  let ptab = PTABS[0].id;
+  $("#fTabs").innerHTML = PTABS.map((t) => `<button type="button" role="tab" data-ptab="${t.id}"><span aria-hidden="true">${t.ico}</span> ${esc(t.name)}<i data-pcount="${t.id}"></i></button>`).join("");
+  $("#fTabs").addEventListener("click", (e) => { const b = e.target.closest("[data-ptab]"); if (b) { ptab = b.dataset.ptab; renderPicker(); $("#fPicker").scrollTop = 0; } });
+  function renderPicker() {
+    $$("[data-ptab]").forEach((b) => { const on = b.dataset.ptab === ptab; b.setAttribute("aria-selected", on); b.classList.toggle("is-on", on); });
+    PTABS.forEach((t) => { const n = Object.values(CAT).filter((it) => it.kind === t.id).reduce((a, it) => a + (cart[it.id] || 0), 0); const el = $(`[data-pcount="${t.id}"]`); el.textContent = n || ""; el.hidden = !n; });
+    $("#fPicker").innerHTML = Object.values(CAT).filter((it) => it.kind === ptab).map((it) => {
+      const q = cart[it.id] || 0;
+      return `<article class="pk${q ? " is-in" : ""}">
+        <div class="pk__img"><img src="${esc(it.img)}" alt="" loading="lazy" width="380" height="272">${it.kind === "promo" ? `<span class="pk__tag">-${money(it.regular - it.price)}</span>` : it.veg ? `<span class="pk__tag pk__tag--veg">Sin carne</span>` : ""}</div>
+        <div class="pk__b"><b>${esc(it.name)}</b><span class="pk__p">${it.regular ? `<s>${money(it.regular)}</s> ` : ""}${money(it.price)}</span></div>
+        ${q ? `<div class="stepper"><button type="button" data-q="-1" data-id="${esc(it.id)}" aria-label="Quitar una ${esc(it.name)}">−</button><span aria-live="polite">${q}</span><button type="button" data-q="1" data-id="${esc(it.id)}" aria-label="Sumar otra ${esc(it.name)}">+</button></div>`
+          : `<button type="button" class="pk__add" data-add="${esc(it.id)}" aria-label="Sumar ${esc(it.name)}, ${money(it.price)}">+</button>`}
+      </article>`;
+    }).join("");
   }
+  let lastTotal = 0;
+  function renderFunnelCart() {
+    const { lines, total } = U.priceCart(cart, today.date); const n = lines.reduce((a, l) => a + l.qty, 0);
+    $("#fCart").innerHTML = lines.length ? `
+      <div class="ticket__h"><b>Tu pedido</b><span>${n} ${n === 1 ? "ítem" : "ítems"}</span></div>
+      ${lines.map((l) => `<div class="ticket__row"><span class="stepper stepper--sm"><button type="button" data-q="-1" data-id="${esc(l.id)}" aria-label="Quitar una ${esc(l.name)}">−</button><span>${l.qty}</span><button type="button" data-q="1" data-id="${esc(l.id)}" aria-label="Sumar otra ${esc(l.name)}">+</button></span><span class="ticket__n">${esc(l.name)}</span><b>${money(l.sub)}</b></div>`).join("")}
+      <div class="ticket__tot"><span>Total</span><b class="${total !== lastTotal ? "is-bump" : ""}">${money(total)}</b></div>
+      <p class="ticket__fine">Precios tamaño familiar · el delivery lo confirma la sucursal</p>`
+      : `<div class="ticket__empty"><span aria-hidden="true">🍕</span><p><b>Tu pedido está vacío</b><br>Tocá <b>+</b> en lo que se te antoje.</p></div>`;
+    lastTotal = total;
+    const nx = $('.fstep[data-step="2"] .fnext'); nx.innerHTML = lines.length && isOrder() ? `Seguir · ${money(total)} <span aria-hidden="true">→</span>` : `Seguir <span aria-hidden="true">→</span>`;
+    if (cart[U.yapa && U.yapa.id] && intent() === "delivery" && $("#fBranch").value !== U.delivery.id) { $("#fBranch").value = U.delivery.id; renderBranchCards(); }
+    if (fstep === 2 && lines.length) clearErr();
+    renderPicker(); updatePreview();
+  }
+
+  /* branch cards mirror the <select> (hoisted: renderStatus calls this before the funnel runs) */
+  function renderBranchCards() {
+    const sel = $("#fBranch"), box = $("#fBranchCards"); if (!sel || !box) return;
+    const it = (document.querySelector("#funnel input[name=intent]:checked") || {}).value;
+    box.innerHTML = [...sel.options].filter((o) => !(it === "pickup" && (o.value === U.delivery.id || o.value === "callcenter"))).map((o) => {
+      const [name, st] = o.textContent.split(" · "); const b = U.branches.find((x) => x.id === o.value);
+      const sub = b ? b.address : o.value === U.delivery.id ? "El delivery de Ugo's 🚌" : "Consultas generales";
+      const open = /abierto|delivery/i.test(st || ""); const on = sel.value === o.value;
+      return `<label class="bcardx${on ? " is-on" : ""}"><input type="radio" name="branchPick" value="${esc(o.value)}" ${on ? "checked" : ""}><span><b>${esc(name)}</b><small>${esc(sub)}</small>${st ? `<em class="${open ? "is-open" : ""}">${esc(st)}</em>` : ""}</span></label>`;
+    }).join("");
+  }
+  $("#fBranchCards").addEventListener("change", (e) => { if (e.target.name === "branchPick") { $("#fBranch").value = e.target.value; renderBranchCards(); clearErr(); updatePreview(); } });
+
+  /* location pin → Google Maps link in the message */
+  $("#fGeo").addEventListener("click", () => {
+    if (!navigator.geolocation) { $("#fGeoS").textContent = "Tu navegador no permite compartir ubicación."; return; }
+    $("#fGeo").classList.add("is-busy"); $("#fGeoT").textContent = "Buscando…";
+    navigator.geolocation.getCurrentPosition((p) => {
+      geoPin = `https://maps.google.com/?q=${p.coords.latitude.toFixed(6)},${p.coords.longitude.toFixed(6)}`;
+      $("#fGeo").classList.remove("is-busy"); $("#fGeo").classList.add("is-ok"); $("#fGeoT").textContent = "Ubicación lista";
+      $("#fGeoS").textContent = `Precisión ~${Math.round(p.coords.accuracy)} m · va en el mensaje`; clearErr(); updatePreview();
+    }, () => { $("#fGeo").classList.remove("is-busy"); $("#fGeoT").textContent = "Compartir mi ubicación"; $("#fGeoS").textContent = "No pudimos obtenerla. Escribí la dirección 👆"; }, { enableHighAccuracy: true, timeout: 12000 });
+  });
+
   function details() {
     const dest = U.destination(val("branch"));
-    return { intent: intent(), cart: ["delivery", "pickup"].includes(intent()) ? cart : {}, branchName: dest.name, name: val("name"), address: val("address"), reference: val("reference"),
-      when: F.querySelector("input[name=when]:checked").value === "later" && val("time") ? val("time") : "asap", note: val("note"), topic: val("qTopic"),
+    return { intent: intent(), cart: isOrder() ? cart : {}, branchName: dest.name, name: val("name"), address: val("address"), reference: val("reference"),
+      pin: intent() === "delivery" ? geoPin : "", when: F.querySelector("input[name=when]:checked").value === "later" && val("time") ? val("time") : "asap", note: val("note"), topic: val("qTopic"),
       event: { date: val("evDate"), people: val("evPeople"), occasion: val("evOcc") }, dest, date: today.date };
   }
-  function updatePreview() { const d = details(); const msg = U.buildMessage(d); $("#phoneOut").textContent = msg; $("#phoneTo").textContent = d.dest.name; return { d, msg }; }
-  function syncFor() {
-    const it = intent(); const order = it === "delivery" || it === "pickup";
-    $$("[data-for]", F).forEach((el) => { const f = el.dataset.for; el.hidden = !(f === "order" ? order : f === "later" ? F.querySelector("input[name=when]:checked").value === "later" : f === it); });
+  let typeT = 0, lastMsg = "";
+  function updatePreview() {
+    const d = details(); const msg = U.buildMessage(d);
+    $("#phoneTo").textContent = d.dest.name;
+    if (msg !== lastMsg) {
+      lastMsg = msg; const out = $("#phoneOut"), ty = $("#phoneTyping");
+      const hm = new Date().toLocaleTimeString("es-BO", { hour: "2-digit", minute: "2-digit" });
+      out.innerHTML = `${esc(msg)}<time>${hm} <span class="ticks">✓✓</span></time>`;
+      if (!reduced) { out.classList.remove("is-pop"); void out.offsetWidth; out.classList.add("is-pop"); }
+      $("#phoneSt").textContent = "escribiendo…"; ty.classList.add("is-on"); clearTimeout(typeT);
+      typeT = setTimeout(() => { $("#phoneSt").textContent = "en línea"; ty.classList.remove("is-on"); }, 1100);
+      const ch = $("#phoneChat"); ch.scrollTop = ch.scrollHeight;
+    }
+    return { d, msg };
   }
+  function syncFor() {
+    const it = intent(); const order = isOrder();
+    $$("[data-for]", F).forEach((el) => { const f = el.dataset.for; el.hidden = !(f === "order" ? order : f === "notevent" ? it !== "event" : f === "later" ? F.querySelector("input[name=when]:checked").value === "later" : f === it); });
+    $$(".icard", F).forEach((l) => l.classList.toggle("is-on", $("input", l).checked));
+    $$(".fseg label", F).forEach((l) => l.classList.toggle("is-on", $("input", l).checked));
+  }
+  /* returns {msg, field} so the error can sit next to what needs fixing */
   function validate(n) {
     const it = intent();
-    if (n === 2 && (it === "delivery" || it === "pickup") && !Object.keys(cart).length) return "Sumá al menos una pizza o combo.";
+    if (n === 2 && isOrder() && !Object.keys(cart).length) return { msg: "Sumá al menos una pizza o combo.", field: "#fPicker" };
     if (n === 3) {
-      if (!val("name")) return "¿Cómo te llamás?";
-      if (it === "delivery" && !val("address") && val("branch") !== "callcenter") return "Necesitamos tu dirección para el delivery.";
-      if (it === "pickup" && val("branch") === U.delivery.id) return "La Scoobyneta es sólo delivery: elegí una sucursal para recoger.";
-      if (cart[U.yapa && U.yapa.id] && val("branch") !== U.delivery.id) return `La Jamoneitor a ${money(U.yapa.price)} es sólo por La Scoobyneta (delivery).`;
+      if (!val("name")) return { msg: "¿Cómo te llamás?", field: "[name=name]" };
+      if (it === "pickup" && [U.delivery.id, "callcenter"].includes(val("branch"))) return { msg: "Elegí la sucursal donde vas a recoger.", field: "#fBranchCards" };
+      if (it === "delivery" && !val("address") && !geoPin && val("branch") !== "callcenter") return { msg: "Necesitamos tu dirección (o tu ubicación) para el delivery.", field: "[name=address]" };
+      if (cart[U.yapa && U.yapa.id] && val("branch") !== U.delivery.id) return { msg: `La Jamoneitor a ${money(U.yapa.price)} es sólo por La Scoobyneta (delivery).`, field: "#fBranchCards" };
     }
-    return "";
+    return null;
   }
-  function gotoStep(n) {
-    fstep = Math.max(1, Math.min(4, n)); syncFor();
-    $$(".fstep", F).forEach((fs) => (fs.hidden = Number(fs.dataset.step) !== fstep));
-    $$("#stepsBar li").forEach((li, i) => li.classList.toggle("is-on", i < fstep));
-    if (fstep === 4) { const { d, msg } = updatePreview(); $("#review").textContent = msg; $("#sendWa").href = U.waUrl(d.dest.whatsapp, msg); $("#sendWa").textContent = `Enviar a ${d.dest.name} por WhatsApp`; }
-    $("#fMsg").textContent = "";
+  function clearErr() { $("#fMsg").textContent = ""; $$(".is-err", F).forEach((el) => el.classList.remove("is-err")); }
+  function showErr(err) {
+    $("#fMsg").textContent = err.msg; const el = $(err.field, F); if (!el) return;
+    const box = el.closest(".fld") || el; box.classList.remove("is-err"); void box.offsetWidth; box.classList.add("is-err");
+    if (el.matches("input, textarea")) el.focus();
   }
+
+  function renderReview(d) {
+    const { lines, total } = U.priceCart(d.cart, d.date);
+    const svc = { delivery: ["🛵", "Delivery"], pickup: ["🏪", "Recojo en sucursal"], event: ["🎉", "Mesa o evento"], question: ["💬", "Consulta"] }[d.intent];
+    const row = (ico, k, v, step) => v ? `<div class="rv__row"><span class="rv__ico" aria-hidden="true">${ico}</span><div><small>${k}</small><span>${esc(v)}</span></div>${step ? `<button type="button" class="rv__edit" data-goto="${step}">Editar</button>` : ""}</div>` : "";
+    $("#review").innerHTML = `
+      <div class="rv__top"><img src="assets/img/logo.png" width="44" height="44" alt=""><div><small>Enviando a</small><b>${esc(d.dest.name)}</b></div><span class="rv__svc">${svc[0]} ${svc[1]}</span></div>
+      ${lines.length ? `<div class="rv__items">${lines.map((l) => `<div><span><i>${l.qty}×</i> ${esc(l.name)}</span><b>${money(l.sub)}</b></div>`).join("")}<button type="button" class="rv__edit" data-goto="2">Editar pedido</button></div>` : ""}
+      <div class="rv__rows">
+        ${row("👤", "Nombre", d.name, 3)}
+        ${d.intent === "delivery" ? row("📍", "Dirección", [d.address, d.reference && `Ref: ${d.reference}`].filter(Boolean).join(" · ") || (d.pin ? "Ubicación compartida" : ""), 3) : ""}
+        ${d.intent === "delivery" && d.pin && d.address ? row("📌", "Ubicación", "Compartida desde tu celular", 3) : ""}
+        ${d.intent === "event" ? row("📅", "Fecha", d.event.date, 2) + row("👥", "Personas", d.event.people, 2) + row("🎉", "Ocasión", d.event.occasion, 2) : ""}
+        ${d.intent === "question" ? row("❓", "Tema", d.topic, 2) : ""}
+        ${d.intent !== "event" ? row("🕒", "Cuándo", d.when === "asap" ? "Lo antes posible" : `Para las ${d.when}`, 3) : ""}
+        ${row("📝", "Nota", d.note, 3)}
+      </div>
+      ${lines.length ? `<div class="rv__tot"><span>Total</span><b>${money(total)}</b></div>` : ""}`;
+  }
+
+  function gotoStep(n, { focus = true } = {}) {
+    const prev = fstep; fstep = Math.max(1, Math.min(4, n)); fmax = Math.max(fmax, fstep); syncFor(); clearErr();
+    if (fstep === 3) renderBranchCards();
+    $$(".fstep", F).forEach((fs) => { const on = Number(fs.dataset.step) === fstep; fs.hidden = !on; if (on && !reduced) { fs.style.setProperty("--dir", fstep >= prev ? 1 : -1); fs.classList.remove("is-enter"); void fs.offsetWidth; fs.classList.add("is-enter"); } });
+    $$("#stepsBar li:not(.steps__fill)").forEach((li, i) => {
+      li.classList.toggle("is-done", i + 1 < fstep); li.classList.toggle("is-on", i + 1 === fstep);
+      const b = $("button", li); b.disabled = i + 1 > fmax; if (i + 1 === fstep) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+    $("#stepsBar").style.setProperty("--p", (fstep - 1) / 3);
+    if (fstep === 4) { const { d, msg } = updatePreview(); renderReview(d); $("#sendWa").href = U.waUrl(d.dest.whatsapp, msg); $("#sendWaT").textContent = `Enviar a ${d.dest.name}`; }
+    if (focus && prev !== fstep) { $(`.fstep[data-step="${fstep}"] legend`).focus({ preventScroll: true }); requestAnimationFrame(() => { const top = F.getBoundingClientRect().top; if (top < 80 || top > innerHeight * .5) F.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); }); }
+  }
+  function next() { const err = validate(fstep); if (err) { showErr(err); return; } gotoStep(fstep + 1); }
   F.addEventListener("click", (e) => {
-    if (e.target.closest("[data-next]")) { const err = validate(fstep); if (err) { $("#fMsg").textContent = err; toast(err); return; } gotoStep(fstep + 1); }
+    if (e.target.closest("[data-next]")) next();
     if (e.target.closest("[data-prev]")) gotoStep(fstep - 1);
   });
-  F.addEventListener("input", () => { syncFor(); updatePreview(); });
+  /* steps bar + "Editar" links jump back (forward only to steps already reached, still validated) */
+  $("#pedir").addEventListener("click", (e) => {
+    const g = e.target.closest("[data-goto]"); if (!g) return; const to = Number(g.dataset.goto);
+    if (to < fstep) return gotoStep(to);
+    for (let s = fstep; s < to; s++) { const err = validate(s); if (err) { gotoStep(s); showErr(err); return; } }
+    gotoStep(to);
+  });
+  /* picking a service is the whole step: advance on its own */
+  F.addEventListener("change", (e) => {
+    if (e.target.name === "intent") { syncFor(); renderFunnelCart(); if (fstep === 1 && !reduced) setTimeout(() => gotoStep(2), 260); }
+  });
+  F.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("input:not([type=radio])")) { e.preventDefault(); next(); } });
+  F.addEventListener("input", (e) => { syncFor(); updatePreview(); if (e.target.closest(".is-err")) clearErr(); });
   F.addEventListener("change", () => { syncFor(); updatePreview(); });
   F.addEventListener("submit", (e) => e.preventDefault());
   $("#sendWa").addEventListener("click", () => {
     const d = details(); if (Object.keys(d.cart).length) saveOrder({ id: null, at: Date.now(), branch: d.dest.id, service: d.intent, cart: { ...cart } });
   });
-  gotoStep(1);
+  renderFunnelCart(); gotoStep(1, { focus: false });
 
   /* ====================== MOBILE BAR / FAB visibility ====================== */
   const vis = { hero: true, funnel: false, footer: false };
