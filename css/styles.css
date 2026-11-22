@@ -226,8 +226,10 @@ input, select, textarea { font: inherit; }
 .spin .eyebrow { color: var(--red); }
 .spin .hl { color: var(--mustard); }
 .spin__head { position: relative; z-index: 2; }
-.spin__stage { position: relative; display: grid; grid-template-columns: 5fr 7fr; grid-template-rows: auto auto; align-items: center; column-gap: 24px; min-height: clamp(420px, 42vw, 580px); }
-.spin__copy { position: relative; z-index: 5; grid-row: 1 / span 2; }
+.spin__stage { position: relative; display: grid; grid-template-columns: 5fr 7fr; grid-template-rows: auto auto; align-items: center; column-gap: 24px; }
+.spin__copy { position: relative; z-index: 5; grid-column: 1; grid-row: 1; max-width: 460px; pointer-events: none; }
+.spin__copy > * { pointer-events: auto; }
+.spin__copy .spin__desc { text-shadow: 0 1px 12px rgba(0,0,0,.6); }
 .spin__copy.is-fast .spin__name { opacity: .55; filter: blur(.5px); transition: opacity .15s; }
 .spin__n span { margin-left: 8px; padding-left: 12px; border-left: 1px solid rgba(251,246,233,.25); color: var(--cream); opacity: .55; letter-spacing: .14em; text-transform: uppercase; }
 /* category chips */
@@ -251,39 +253,53 @@ input, select, textarea { font: inherit; }
 .spin__copy .anim:nth-child(2) { animation-delay: .04s; } .spin__copy .anim:nth-child(3) { animation-delay: .08s; }
 .spin__copy .anim:nth-child(4) { animation-delay: .12s; } .spin__copy .anim:nth-child(5) { animation-delay: .16s; }
 @keyframes spinTxt { from { opacity: 0; transform: translate(calc(var(--dir, 1) * 34px), calc((1 - var(--dir, 1) * var(--dir, 1)) * 18px)); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: none; clip-path: inset(0 0 -20% 0); } }
-.spin__table { grid-column: 2; position: relative; z-index: 1; isolation: isolate; height: clamp(400px, 40vw, 560px); outline: none; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+.spin__table { grid-column: 1 / -1; grid-row: 1; position: relative; z-index: 1; isolation: isolate; overflow: hidden; height: clamp(480px, 46vw, 640px); margin-inline: calc(50% - 50vw); outline: none; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+/* text side and top edge fade into the room, like a spotlight on the table */
+.spin__table { -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 84%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 84%, transparent 100%); }
+.spin__table::after { content: ""; position: absolute; inset: 0; z-index: 300; pointer-events: none; background: linear-gradient(90deg, rgba(20,10,7,.94) 0%, rgba(20,10,7,.78) 22%, rgba(20,10,7,.2) 42%, transparent 55%); }
 .spin__table.is-drag { cursor: grabbing; }
 .spin__table:focus-visible { outline: 3px solid var(--mustard); outline-offset: 6px; border-radius: 24px; }
-.board { position: absolute; left: 50%; top: 40%; width: 0; height: 0; perspective: 1400px; }
-.board__disc { position: absolute; width: var(--bd, 760px); height: var(--bd, 760px); left: calc(var(--bd, 760px) / -2); top: calc(var(--bd, 760px) / -2); border-radius: 50%;
-  transform: rotateX(64deg) rotateZ(var(--rot, 0deg));
+.board { position: absolute; inset: 0; }
+.board__disc { position: absolute; width: var(--bd, 2000px); height: var(--bd, 2000px); border-radius: 50%; transform: rotate(var(--rot, 0deg)); will-change: transform;
   background:
-    radial-gradient(circle, transparent 61%, rgba(0,0,0,.35) 61.4%, transparent 62.4%),
-    repeating-radial-gradient(circle at 48% 52%, rgba(60,25,5,.0) 0 7px, rgba(60,25,5,.16) 8px 9px, rgba(60,25,5,0) 10px 15px),
-    repeating-conic-gradient(from 10deg, rgba(255,220,170,.05) 0 2deg, rgba(0,0,0,.05) 3deg 5deg),
-    radial-gradient(circle at 40% 35%, #c8844a, #9a5a2a 55%, #6d3a17 100%);
-  box-shadow: 0 0 0 10px #5a2e12, 0 0 0 12px #3b1d0a, 0 60px 80px 10px rgba(0,0,0,.6); }
+    radial-gradient(circle, transparent 0 93.5%, rgba(0,0,0,.28) 95%, rgba(0,0,0,.05) 96.4%, rgba(255,210,160,.08) 97%, rgba(0,0,0,.35) 100%),
+    radial-gradient(circle, transparent 55%, rgba(30,10,0,.32) 100%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.42) 0 2px, rgba(255,215,170,.07) 2px 3px, transparent 3px 132px),
+    repeating-linear-gradient(90deg, rgba(255,230,190,.05) 0 132px, rgba(40,15,0,.08) 132px 264px, rgba(255,200,140,.03) 264px 396px, rgba(30,10,0,.12) 396px 528px),
+    repeating-linear-gradient(91deg, transparent 0 5px, rgba(60,25,5,.09) 5px 6px, transparent 6px 13px, rgba(255,220,170,.05) 13px 14px, transparent 14px 23px),
+    repeating-linear-gradient(89.3deg, transparent 0 31px, rgba(50,20,0,.1) 31px 33px, transparent 33px 71px),
+    linear-gradient(160deg, #a5643a, #8c4f27 45%, #9b5c32 70%, #7a421f);
+  box-shadow: 0 0 0 3px rgba(0,0,0,.35), 0 -30px 80px 10px rgba(0,0,0,.55); }
 .board__rim { position: absolute; inset: 0; width: 100%; height: 100%; }
-.board__rim text { font: 700 13px var(--font-body); letter-spacing: .5em; fill: rgba(40,15,2,.45); }
+.board__rim text { font: 700 3.4px var(--font-body); letter-spacing: 2.6px; fill: rgba(255,228,195,.2); }
 .spin__pizzas { position: absolute; inset: 0; pointer-events: none; }
-.pz { position: absolute; left: 0; top: 0; width: var(--pw, 420px); transform-origin: 50% 80%; will-change: transform, filter; pointer-events: auto; background: none; border: 0; padding: 0; }
-.pz img { width: 100%; height: auto; filter: drop-shadow(0 26px 22px rgba(0,0,0,.55)); pointer-events: none; -webkit-user-drag: none; }
+.gdefs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.pz { position: absolute; left: 0; top: 0; width: var(--pw, 420px); height: var(--pw, 420px); will-change: transform, filter; pointer-events: auto; background: none; border: 0; padding: 0; border-radius: 50%; }
+.pz::before { content: ""; position: absolute; inset: 3%; border-radius: 50%; box-shadow: 0 26px 44px rgba(0,0,0,.55), 0 8px 14px rgba(0,0,0,.45), 0 1px 3px rgba(0,0,0,.5); }
+.pz__spin { position: absolute; inset: 0; transform: rotate(calc(var(--r0, 0deg) + var(--r, 0deg))); }
+.pz__g { position: absolute; inset: -25%; width: 150%; height: 150%; overflow: visible; pointer-events: none; filter: drop-shadow(0 5px 5px rgba(0,0,0,.5)) saturate(.9); }
+.pz img { position: relative; display: block; width: 100%; height: 100%; pointer-events: none; -webkit-user-drag: none; }
 .pz.is-front { cursor: pointer; }
 .spin__table.is-drag .pz { cursor: grabbing; }
 .pz.is-pop img { animation: pzPop .5s var(--ease); }
 @keyframes pzPop { 0% { transform: none; } 35% { transform: scale(1.07) translateY(-14px) rotate(-2deg); } 100% { transform: none; } }
 /* warm light + steam under the pizza at the front */
-.spin__glow { position: absolute; transform: translate(-50%, -62%); pointer-events: none; z-index: 0; transition: opacity .2s; }
-.spin__glow::before { content: ""; position: absolute; inset: -30% -10%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,200,90,.42), rgba(255,66,0,.14) 55%, transparent); filter: blur(6px); }
-.spin__glow i { position: absolute; bottom: 120%; left: 50%; width: 46px; height: 110px; margin-left: -23px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,245,225,.32), transparent); filter: blur(10px); opacity: 0; animation: steam 3.6s ease-in infinite; z-index: 300; }
-.spin__glow i:nth-child(2) { left: 38%; animation-delay: 1.2s; } .spin__glow i:nth-child(3) { left: 62%; animation-delay: 2.4s; }
+.spin__glow { position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 0; transition: opacity .2s; }
+.spin__glow::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,190,110,.28), rgba(255,120,40,.08) 60%, transparent); }
+.spin__glow i { display: none; }
 @keyframes steam { 0% { opacity: 0; transform: translateY(40px) scaleX(.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(-70px) scaleX(1.4) rotate(8deg); } }
 /* "drag me" hint, gone after the first interaction */
-.spin__hint { position: absolute; left: 50%; bottom: 4%; z-index: 400; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: .55em 1.1em .55em .8em; border-radius: 999px; background: rgba(20,10,7,.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); box-shadow: inset 0 0 0 1px rgba(251,246,233,.15); font: 700 .72rem var(--font-body); letter-spacing: .14em; text-transform: uppercase; pointer-events: none; transition: opacity .4s, transform .4s var(--ease); }
+.spin__hint { position: absolute; left: 64%; bottom: 5%; z-index: 400; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: .55em 1.1em .55em .8em; border-radius: 999px; background: rgba(20,10,7,.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); box-shadow: inset 0 0 0 1px rgba(251,246,233,.15); font: 700 .72rem var(--font-body); letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; pointer-events: none; transition: opacity .4s, transform .4s var(--ease); }
+/* one dot per pizza on the right edge */
+.spin__dots { position: absolute; right: clamp(14px, 2.4vw, 32px); top: 50%; transform: translateY(-50%); z-index: 350; display: flex; flex-direction: column; gap: 4px; }
+.spin__dots button { width: 14px; height: 14px; padding: 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.spin__dots button::before { content: ""; width: 6px; height: 6px; border-radius: 50%; box-shadow: inset 0 0 0 1.2px rgba(251,246,233,.45); transition: all .3s var(--ease); }
+.spin__dots button:hover::before { box-shadow: inset 0 0 0 1.2px var(--cream); }
+.spin__dots button.is-on::before { background: var(--red); box-shadow: none; transform: scale(1.35); }
 .spin__hand { font-size: 1.15rem; display: inline-block; animation: hand 1.8s var(--ease) infinite; }
 @keyframes hand { 0%, 100% { transform: translateX(-8px) rotate(-12deg); } 50% { transform: translateX(10px) rotate(10deg); } }
 .spin__hint.is-gone { opacity: 0; transform: translate(-50%, 10px); }
-.spin__nav { grid-column: 2; position: relative; z-index: 6; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; margin-top: 6px; }
+.spin__nav { grid-column: 2; grid-row: 2; position: relative; z-index: 6; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; margin-top: 6px; }
 .spin__nav .rbtn { position: relative; color: var(--cream); flex: none; }
 .spin__nav .rbtn::after { content: attr(data-peek); position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translate(-50%, 6px); white-space: nowrap; font: 400 1.05rem var(--font-display); letter-spacing: .04em; color: var(--ink); background: var(--mustard); padding: .25em .7em; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .25s var(--ease); }
 .spin__nav .rbtn:hover::after, .spin__nav .rbtn:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
@@ -816,7 +832,12 @@ body.chat-open .toast { bottom: 190px; }
   .dial__n { font-size: 1.15rem; }
   .spin__copy .ichips, .spin__buy, .spin__n, .spin__badges { justify-content: center; }
   .spin__desc { margin-left: auto; margin-right: auto; }
-  .spin__table { order: 1; height: clamp(320px, 86vw, 460px); margin: 0 -20px; }
+  .spin__table { order: 1; grid-row: auto; height: clamp(340px, 96vw, 480px); margin-inline: calc(50% - 50vw); }
+  .spin__table::after { display: none; }
+  .spin__copy { grid-row: auto; max-width: none; }
+  .spin__dots { display: none; }
+  .spin__hint { left: 50%; }
+  .spin__nav { grid-row: auto; }
   .spin__nav { order: 2; margin-top: -6px; gap: 8px; }
   .yapa__grid, .pale__grid, .story__grid { grid-template-columns: 1fr; }
   .story__vid { margin: 0 auto; width: 70%; }

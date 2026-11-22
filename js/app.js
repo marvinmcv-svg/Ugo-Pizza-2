@@ -215,23 +215,42 @@
    *  - drag: pos follows the finger 1:1; release keeps the flick's momentum and a spring lands
    *    it exactly on the pizza where that momentum would have stopped (so a hard flick spins several).
    *  - wheel / trackpad (horizontal), arrows, Home/End, category chips, name dial, prev/next.
-   *  - everything visual (pizzas, board, name dial, progress, glow) is drawn from `pos` each frame. */
+   *  - everything visual (pizzas, board, name dial, progress, glow) is drawn from `pos` each frame.
+   * Seen from above: a big wooden table turns around a centre below the stage, the pizza in front sits
+   * at 12 o'clock, the next one swings in from the right and each pizza turns with the wood. */
   const Spin = (function () {
     const table = $("#spinTable"), wrap = $("#spinPizzas"), disc = $("#boardDisc"), copy = $("#spinCopy");
     const dial = $("#spinDial"), cats = $("#spinCats"), glow = $("#spinGlow"), hint = $("#spinHint");
-    const N = allPizzas.length; const STEP = 46 * Math.PI / 180; const TILT = 64 * Math.PI / 180;
+    const N = allPizzas.length; let STEP = 34 * Math.PI / 180;
     const pad = (n) => String(n).padStart(2, "0");
     const idxOf = (p) => ((Math.round(p) % N) + N) % N;
     const wrapD = (d) => { d = ((d % N) + N) % N; return d > N / 2 ? d - N : d; };
     let intro = null, pos = 0, vel = 0, target = 0, mode = "idle", raf = 0, last = 0, shown = -1, lastTick = 0, geo = {}, hover = false, touched = false;
 
-    wrap.innerHTML = allPizzas.map((p, i) => `<button class="pz" id="pz-${i}" data-i="${i}" tabindex="-1" role="option" aria-selected="false" aria-label="${esc(p.name)}, ${money(p.price)}"><img src="${esc(p.img)}" width="760" height="543" alt="" ${i > 2 && i < N - 2 ? 'loading="lazy"' : ""} draggable="false"></button>`).join("");
+    /* garnish around each pizza (basil + cherry tomatoes), laid out differently per pizza, turns with it */
+    const rnd = (k) => { const x = Math.sin(k * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+    function garnish(i) {
+      const g = []; const base = rnd(i) * 360; const n = 2 + Math.round(rnd(i + 7) * 2);
+      for (let k = 0; k < n; k++) {
+        const a = base + k * (300 / n) + rnd(i * 9 + k) * 40, d = 47 + rnd(i * 3 + k) * 7, s = .8 + rnd(i * 5 + k) * .5, r = a + 60 + rnd(i + k * 11) * 80;
+        g.push(`<use href="#gBasil" transform="rotate(${a.toFixed(1)}) translate(0 ${-d.toFixed(1)}) rotate(${(r - a).toFixed(1)}) scale(${s.toFixed(2)})"/>`);
+      }
+      const ta = base + 150 + rnd(i + 3) * 60;
+      g.push(`<g transform="rotate(${ta.toFixed(1)}) translate(0 -53)"><use href="#gTom" transform="translate(-5 2) scale(1)"/><use href="#gTom" transform="translate(6 -4) scale(.82)"/>${rnd(i + 5) > .45 ? '<use href="#gTom" transform="translate(4 8) scale(.7)"/>' : ""}<use href="#gStem" transform="rotate(${(rnd(i) * 90).toFixed(0)})"/></g>`);
+      return `<svg class="pz__g" viewBox="-75 -75 150 150" aria-hidden="true">${g.join("")}</svg>`;
+    }
+    const topImg = (src) => src.replace("assets/img/", "assets/img/top/");
+    wrap.innerHTML = allPizzas.map((p, i) => `<button class="pz" id="pz-${i}" data-i="${i}" tabindex="-1" role="option" aria-selected="false" aria-label="${esc(p.name)}, ${money(p.price)}"><span class="pz__spin" style="--r0:${(rnd(i + 21) * 360).toFixed(0)}deg">${garnish(i)}<img src="${esc(topImg(p.img))}" width="720" height="720" alt="" ${i > 2 && i < N - 2 ? 'loading="lazy"' : ""} draggable="false"></span></button>`).join("");
     const els = $$(".pz", wrap);
-    els.forEach((el) => { const img = $("img", el); const set = () => { el._ar = img.naturalHeight / img.naturalWidth || .71; render(); }; img.complete ? set() : img.addEventListener("load", set); });
 
     /* name dial: every pizza name on a strip that slides with the board */
     dial.innerHTML = `<div class="dial__track">${allPizzas.map((p, i) => `<button class="dial__n" data-i="${i}" tabindex="-1">${esc(p.name)}</button>`).join("")}</div><span class="dial__notch" aria-hidden="true"></span><div class="dial__bar"><i id="spinProg"></i></div>`;
     const names = $$(".dial__n", dial); const prog = $("#spinProg");
+    /* vertical dots on the right edge, one per pizza */
+    $("#spinDots").innerHTML = allPizzas.map((p, i) => `<button type="button" data-i="${i}" tabindex="-1" aria-label="${esc(p.name)}"></button>`).join("");
+    const dots = $$("#spinDots button");
+    $("#spinDots").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { interacted(); goTo(Number(b.dataset.i)); } });
+    $("#spinDots").addEventListener("pointerdown", (e) => e.stopPropagation());
 
     /* category chips: jump to the category; tap again to walk through it */
     const groups = [...U.menu.map((c) => ({ id: c.id, name: c.name, test: (p) => p.cat === c.id })), { id: "veg", name: "Sin carne", test: (p) => !!p.veg }]
@@ -245,32 +264,36 @@
 
     function measure() {
       const W = table.clientWidth, H = table.clientHeight, m = W < 640;
-      const R = m ? W * .62 : Math.min(W * .5, H * .95);
-      geo = { W, H, R, m, ry: R * Math.cos(TILT), cx: W / 2, cy: H * (m ? .36 : .38), pw: m ? W * .66 : Math.min(W * .58, H * 1.0), per: R * Math.sin(STEP) || 200, gap: m ? 128 : 165 };
-      disc.style.setProperty("--bd", R * 2.15 + "px"); disc.parentElement.style.top = geo.cy + geo.ry * .18 + "px";
-      wrap.style.setProperty("--pw", geo.pw + "px");
-      glow.style.cssText = `left:${geo.cx}px;top:${geo.cy + geo.ry}px;width:${geo.pw * 1.25}px;height:${geo.pw * .55}px`;
+      const pd = m ? Math.min(W * .74, H * .78) : Math.min(H * .8, W * .44);        // pizza diameter
+      const fx = m ? W * .5 : W * .64, fy = m ? H * .5 : H * .53;                   // where the front pizza sits
+      const Rp = pd * (m ? 1.75 : 1.95);                                            // radius of the ring of pizzas
+      STEP = 2 * Math.asin(Math.min(.95, (pd * (m ? .54 : .58)) / Rp));             // neighbours almost touch
+      const Rb = Rp + pd * .66;                                                     // table radius
+      geo = { W, H, m, pd, fx, fy, Rp, Rb, cx: fx, cy: fy + Rp, per: Rp * Math.sin(STEP) || 200, gap: m ? 128 : 165 };
+      disc.style.cssText = `--bd:${Rb * 2}px;left:${fx - Rb}px;top:${fy + Rp - Rb}px`;
+      wrap.style.setProperty("--pw", pd + "px");
+      glow.style.cssText = `left:${fx}px;top:${fy}px;width:${pd * 1.5}px;height:${pd * 1.5}px`;
       render();
     }
 
     function render() {
-      const { R, ry, cx, cy, pw, gap } = geo; if (!R) return;
+      const { pd, cx, cy, Rp, W, gap } = geo; if (!pd) return;
       const speed = Math.min(1, Math.abs(vel) * 60);           // 0 = still, 1 = whirling
+      const reach = Math.asin(Math.min(1, (W * .75 + pd) / Rp)) + STEP * .6;        // beyond this a pizza is off-stage
       els.forEach((el, i) => {
         const th = wrapD(i - pos) * STEP; const a = Math.abs(th);
-        if (a > 2.1) { if (el._v !== 0) { el.style.visibility = "hidden"; el._v = 0; } return; }
+        if (a > reach) { if (el._v !== 0) { el.style.visibility = "hidden"; el._v = 0; } return; }
         if (el._v !== 1) { el.style.visibility = "visible"; el._v = 1; }
-        const c = Math.cos(th), depth = (1 + c) / 2, front = Math.max(0, 1 - a / (STEP * .6));
-        const lift = front * (hover ? 1 : 0) * (1 - speed);
-        const s = (.34 + .66 * Math.pow(depth, 1.7)) * (1 + .05 * front * (1 - speed) + .04 * lift);
-        const x = cx + R * Math.sin(th), y = cy + ry * c - front * (1 - speed) * 10 - lift * 12; const h = pw * (el._ar || .71);
-        el.style.transform = `translate(${x - pw / 2}px, ${y - h * .8}px) scale(${s}) rotate(${(-Math.sin(th) * 4 * speed).toFixed(2)}deg)`;
-        el.style.zIndex = 100 + Math.round(depth * 100);
-        el.style.filter = `brightness(${(.28 + .72 * depth * depth).toFixed(3)}) saturate(${(.7 + .3 * depth).toFixed(3)})${speed > .15 ? ` blur(${(speed * 2.2 * (1 - front * .6)).toFixed(2)}px)` : ""}`;
-        el.style.opacity = Math.max(0, Math.min(1, (2.1 - a) / .45));
+        const front = Math.max(0, 1 - a / (STEP * .7)), lift = front * (hover ? 1 : 0) * (1 - speed);
+        const x = cx + Rp * Math.sin(th), y = cy - Rp * Math.cos(th) - lift * 6;
+        el.style.transform = `translate(${(x - pd / 2).toFixed(1)}px, ${(y - pd / 2).toFixed(1)}px) scale(${(1 + .025 * lift).toFixed(3)})`;
+        el.style.setProperty("--r", (th * 180 / Math.PI).toFixed(2) + "deg");
+        el.style.zIndex = 200 - Math.round(a * 40);
+        el.style.filter = `brightness(${(.42 + .58 * Math.max(front, 1 - a / (STEP * 1.6))).toFixed(3)})`;
         const isF = a < STEP / 2; if (el._f !== isF) { el._f = isF; el.classList.toggle("is-front", isF); el.setAttribute("aria-selected", isF); }
       });
-      disc.style.setProperty("--rot", (-pos * 46) + "deg");
+      disc.style.setProperty("--rot", (-pos * STEP * 180 / Math.PI).toFixed(2) + "deg");
+      if (dots) dots.forEach((d, i) => { const on = i === idxOf(pos); if (d._on !== on) { d._on = on; d.classList.toggle("is-on", on); } });
       glow.style.opacity = (1 - speed * .8) * (.75 + .25 * (1 - Math.abs(wrapD(pos - Math.round(pos))) * 2));
       names.forEach((el, i) => {
         const d = wrapD(i - pos), a = Math.abs(d);
@@ -451,7 +474,7 @@
     if (!reduced && "IntersectionObserver" in window) {
       const io = new IntersectionObserver(([en]) => {
         if (!en.isIntersecting) return; io.disconnect();
-        setTimeout(() => { if (touched || mode !== "idle") return; intro = { from: pos, to: pos + N, t0: performance.now(), dur: 2200 }; target = intro.to; mode = "intro"; kick(); }, 250);
+        setTimeout(() => { if (touched || mode !== "idle") return; intro = { from: pos, to: pos + N, t0: performance.now(), dur: 3400 }; target = intro.to; mode = "intro"; kick(); }, 250);
       }, { threshold: .45 });
       io.observe(table);
     }
