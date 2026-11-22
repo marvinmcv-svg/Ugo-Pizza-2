@@ -74,15 +74,15 @@
 
     // HOME "#NUESTRAS PROMOS" (ugospizzas.com/wp-content/uploads/2026/08/Promo-*.webp). All "8 porciones · Tamaño Familiar".
     combos: [
-      { id: "combo-2-jamoneitor", name: "2 Jamoneitor + Pepsi 2 L", price: 100, img: "assets/img/combo-2-jamoneitor.webp", note: "2 pizzas Jamoneitor familiares + Pepsi 2 litros", parts: ["jamoneitor", "jamoneitor"], drink: "Pepsi 2 L", star: true, tag: "Para compartir" },
-      { id: "combo-2-salchichonas", name: "2 Salchichonas + Pepsi 2 L", price: 100, img: "assets/img/combo-2-salchichonas.webp", note: "2 pizzas Salchichona familiares + Pepsi 2 litros", parts: ["salchichona", "salchichona"], drink: "Pepsi 2 L", tag: "Para compartir" },
-      { id: "combo-jamoneitor", name: "Jamoneitor + Pepsi 2 L", price: 60, img: "assets/img/combo-jamoneitor.webp", note: "Pizza Jamoneitor familiar + Pepsi 2 litros", parts: ["jamoneitor"], drink: "Pepsi 2 L", tag: "Favorito" },
-      { id: "combo-salchichona", name: "Salchichona + Pepsi 2 L", price: 60, img: "assets/img/combo-salchichona.webp", note: "Pizza Salchichona familiar + Pepsi 2 litros", parts: ["salchichona"], drink: "Pepsi 2 L" },
-      { id: "combo-chocluda", name: "Chocluda + Guaraná 2 L", price: 60, img: "assets/img/combo-chocluda.webp", note: "Pizza Chocluda familiar + Guaraná 2 litros", parts: ["chocluda"], drink: "Guaraná 2 L" },
-      { id: "combo-americana", name: "Americana + Pepsi 1 L", price: 62, img: "assets/img/combo-americana.webp", note: "Pizza Americana familiar + Pepsi 1 litro", parts: ["americana"], drink: "Pepsi 1 L" },
-      { id: "combo-salame", name: "Salame + Pepsi 1 L", price: 62, img: "assets/img/combo-salame.webp", note: "Pizza Salame familiar + Pepsi 1 litro", parts: ["salame"], drink: "Pepsi 1 L" },
-      { id: "combo-bruto-tocino", name: "Bruto Tocino + Pepsi 2 L", price: 65, img: "assets/img/combo-bruto-tocino.webp", note: "Pizza Bruto Tocino familiar + Pepsi 2 litros", parts: ["bruto-tocino"], drink: "Pepsi 2 L" },
-      { id: "combo-strogonoff-pollo", name: "Strogonoff de Pollo + Pepsi 1 L", price: 66, img: "assets/img/combo-strogonoff-pollo.webp", note: "Pizza Strogonoff de Pollo familiar + Pepsi 1 litro", parts: ["strogonoff-pollo"], drink: "Pepsi 1 L" },
+      { id: "combo-2-jamoneitor", name: "2 Jamoneitor + Pepsi 2 L", price: 100, poster: "assets/img/promo-2-jamoneitor.webp", img: "assets/img/combo-2-jamoneitor.webp", note: "2 pizzas Jamoneitor familiares + Pepsi 2 litros", parts: ["jamoneitor", "jamoneitor"], drink: "Pepsi 2 L", star: true, tag: "Para compartir" },
+      { id: "combo-2-salchichonas", name: "2 Salchichonas + Pepsi 2 L", price: 100, poster: "assets/img/promo-2-salchichonas.webp", img: "assets/img/combo-2-salchichonas.webp", note: "2 pizzas Salchichona familiares + Pepsi 2 litros", parts: ["salchichona", "salchichona"], drink: "Pepsi 2 L", tag: "Para compartir" },
+      { id: "combo-jamoneitor", name: "Jamoneitor + Pepsi 2 L", price: 60, poster: "assets/img/promo-jamoneitor.webp", img: "assets/img/combo-jamoneitor.webp", note: "Pizza Jamoneitor familiar + Pepsi 2 litros", parts: ["jamoneitor"], drink: "Pepsi 2 L", tag: "Favorito" },
+      { id: "combo-salchichona", name: "Salchichona + Pepsi 2 L", price: 60, poster: "assets/img/promo-salchichona.webp", img: "assets/img/combo-salchichona.webp", note: "Pizza Salchichona familiar + Pepsi 2 litros", parts: ["salchichona"], drink: "Pepsi 2 L" },
+      { id: "combo-chocluda", name: "Chocluda + Guaraná 2 L", price: 60, poster: "assets/img/promo-chocluda.webp", img: "assets/img/combo-chocluda.webp", note: "Pizza Chocluda familiar + Guaraná 2 litros", parts: ["chocluda"], drink: "Guaraná 2 L" },
+      { id: "combo-americana", name: "Americana + Pepsi 1 L", price: 62, poster: "assets/img/promo-americana.webp", img: "assets/img/combo-americana.webp", note: "Pizza Americana familiar + Pepsi 1 litro", parts: ["americana"], drink: "Pepsi 1 L" },
+      { id: "combo-salame", name: "Salame + Pepsi 1 L", price: 62, poster: "assets/img/promo-salame.webp", img: "assets/img/combo-salame.webp", note: "Pizza Salame familiar + Pepsi 1 litro", parts: ["salame"], drink: "Pepsi 1 L" },
+      { id: "combo-bruto-tocino", name: "Bruto Tocino + Pepsi 2 L", price: 65, poster: "assets/img/promo-bruto-tocino.webp", img: "assets/img/combo-bruto-tocino.webp", note: "Pizza Bruto Tocino familiar + Pepsi 2 litros", parts: ["bruto-tocino"], drink: "Pepsi 2 L" },
+      { id: "combo-strogonoff-pollo", name: "Strogonoff de Pollo + Pepsi 1 L", price: 66, poster: "assets/img/promo-strogonoff-pollo.webp", img: "assets/img/combo-strogonoff-pollo.webp", note: "Pizza Strogonoff de Pollo familiar + Pepsi 1 litro", parts: ["strogonoff-pollo"], drink: "Pepsi 1 L" },
     ],
 
     // Monthly special. IG DfapG5MludI / DfkrFlzoHYR / DfphlqNuh8Y / Df2marUnKKC (Nov 2026):
@@ -91,7 +91,7 @@
       id: "promo-jamoneitor-35", name: "Jamoneitor Scoobyneta", ref: "jamoneitor", price: 35, regular: 47,
       from: "2026-11-01", until: "2026-11-30", channel: "scoobyneta", month: "noviembre",
       img: "assets/img/pizza-jamoneitor.webp", post: "assets/img/ig-DfapG5MludI.webp",
-      url: "https://www.instagram.com/p/DfapG5MludI/",
+      source: "IG DfapG5MludI",
       note: "Sólo pidiendo por La Scoobyneta (delivery de Ugo's) · primeras 100 pizzas del día",
     },
 
@@ -99,15 +99,20 @@
     delivery: { id: "scoobyneta", name: "La Scoobyneta", whatsapp: "59176066200", desc: "El delivery de Ugo's" },
 
     // "Descubrí nuestras promos" row: current promo images only (HOME 2026/08 + IG Nov 2026)
+    // Shown and opened inside this site (no links out). `add` = the catalog item the promo sells;
+    // `source` = where the image was published.
     offers: [
-      { img: "assets/img/ig-DfapG5MludI.webp", href: "https://www.instagram.com/p/DfapG5MludI/", alt: "Llegó La Scoobyneta: Jamoneitor a 35 Bs en noviembre" },
-      { img: "assets/img/promo-2-jamoneitor.webp", href: "https://ugospizzas.com/", alt: "2 Jamoneitor + Pepsi 2 L a 100 Bs" },
-      { img: "assets/img/ig-Df2marUnKKC.webp", href: "https://www.instagram.com/p/Df2marUnKKC/", alt: "Por si se acaba el mundo: Jamoneitor a 35 Bs por La Scoobyneta" },
-      { img: "assets/img/promo-bruto-tocino.webp", href: "https://ugospizzas.com/", alt: "Bruto Tocino + Pepsi 2 L a 65 Bs" },
-      { img: "assets/img/promo-2-salchichonas.webp", href: "https://ugospizzas.com/", alt: "2 Salchichonas + Pepsi 2 L a 100 Bs" },
-      { img: "assets/img/promo-americana.webp", href: "https://ugospizzas.com/", alt: "Americana + Pepsi 1 L a 62 Bs" },
-      { img: "assets/img/promo-chocluda.webp", href: "https://ugospizzas.com/", alt: "Chocluda + Guaraná 2 L a 60 Bs" },
-      { img: "assets/img/promo-strogonoff-pollo.webp", href: "https://ugospizzas.com/", alt: "Strogonoff de Pollo + Pepsi 1 L a 66 Bs" },
+      { img: "assets/img/ig-DfapG5MludI.webp", add: "promo-jamoneitor-35", source: "IG DfapG5MludI", alt: "Llegó La Scoobyneta: Jamoneitor a 35 Bs en noviembre" },
+      { img: "assets/img/promo-2-jamoneitor.webp", add: "combo-2-jamoneitor", source: "HOME", alt: "2 Jamoneitor + Pepsi 2 L a 100 Bs" },
+      { img: "assets/img/ig-Df2marUnKKC.webp", add: "promo-jamoneitor-35", source: "IG Df2marUnKKC", alt: "Por si se acaba el mundo: Jamoneitor a 35 Bs por La Scoobyneta" },
+      { img: "assets/img/promo-bruto-tocino.webp", add: "combo-bruto-tocino", source: "HOME", alt: "Bruto Tocino + Pepsi 2 L a 65 Bs" },
+      { img: "assets/img/promo-2-salchichonas.webp", add: "combo-2-salchichonas", source: "HOME", alt: "2 Salchichonas + Pepsi 2 L a 100 Bs" },
+      { img: "assets/img/promo-jamoneitor.webp", add: "combo-jamoneitor", source: "HOME", alt: "Jamoneitor + Pepsi 2 L a 60 Bs" },
+      { img: "assets/img/promo-americana.webp", add: "combo-americana", source: "HOME", alt: "Americana + Pepsi 1 L a 62 Bs" },
+      { img: "assets/img/promo-salchichona.webp", add: "combo-salchichona", source: "HOME", alt: "Salchichona + Pepsi 2 L a 60 Bs" },
+      { img: "assets/img/promo-chocluda.webp", add: "combo-chocluda", source: "HOME", alt: "Chocluda + Guaraná 2 L a 60 Bs" },
+      { img: "assets/img/promo-salame.webp", add: "combo-salame", source: "HOME", alt: "Salame + Pepsi 1 L a 62 Bs" },
+      { img: "assets/img/promo-strogonoff-pollo.webp", add: "combo-strogonoff-pollo", source: "HOME", alt: "Strogonoff de Pollo + Pepsi 1 L a 66 Bs" },
     ],
 
     featured: [
@@ -132,15 +137,15 @@
     ],
 
     facts: [
-      "Ugo's Pizza es una cadena de restaurantes 100% boliviana (ugospizzas.com).",
-      "El sabor único de Ugo's: masa madre, urucú y salsa preparada a la leña (banner 'Ingredientes' de ugospizzas.com).",
+      "Ugo's Pizza es una cadena de restaurantes 100% boliviana.",
+      "El sabor único de Ugo's: masa madre, urucú y salsa preparada a la leña (banner 'Ingredientes' de la web oficial).",
       "Todas las pizzas son tamaño familiar de 8 porciones.",
       "La pizza más vendida de Ugo's es la Cheeseburguer (Instagram).",
       "La Scoobyneta es el delivery de Ugo's; se pide al WhatsApp 76066200.",
       "Para pedidos generales está el WhatsApp 60007071.",
       "Ugo's tiene la Caja Transformer: la caja se divide por las líneas en cuatro platos, y doblándola tenés una mini caja para llevar.",
       "Ugo's está preparando una nueva pizza 'combinación carnívora' que llegará pronto (todavía sin nombre ni precio).",
-      "Ugo's ofrece franquicias: ugospizzas.com/franquicias.",
+      "Ugo's ofrece franquicias: se piden en la sección Franquicias de esta página (formulario que llega por WhatsApp al call center).",
       "No tenemos información publicada de alérgenos, costo de delivery ni medios de pago: eso se consulta con la sucursal.",
     ],
 
@@ -158,23 +163,23 @@
     },
 
     reels: [
-      { src: "assets/video/cheeseburguer", caption: "La más vendida: Cheeseburguer 🍔🍕", url: "https://www.instagram.com/p/Df98OMcuhXH/" },
-      { src: "assets/video/scoobyneta-35", caption: "Jamoneitor a 35 Bs por La Scoobyneta", url: "https://www.instagram.com/p/DfphlqNuh8Y/" },
-      { src: "assets/video/jamoneitor-35", caption: "En noviembre nos volvemos locos 🤪", url: "https://www.instagram.com/p/DfkrFlzoHYR/" },
-      { src: "assets/video/kit-supervivencia", caption: "Tu kit de supervivencia 🔥", url: "https://www.instagram.com/p/Df0DxInuIvG/" },
-      { src: "assets/video/apagon", caption: "Que no te sorprenda el apagón 🚨", url: "https://www.instagram.com/p/Dfx1wxHlvJm/" },
-      { src: "assets/video/suegra", caption: "¿Querés conquistar a tu suegra? 👑", url: "https://www.instagram.com/p/DfC0seNoVa7/" },
+      { src: "assets/video/cheeseburguer", caption: "La más vendida: Cheeseburguer 🍔🍕", source: "IG Df98OMcuhXH" , add: "cheeseburguer" },
+      { src: "assets/video/scoobyneta-35", caption: "Jamoneitor a 35 Bs por La Scoobyneta", source: "IG DfphlqNuh8Y" , add: "promo-jamoneitor-35" },
+      { src: "assets/video/jamoneitor-35", caption: "En noviembre nos volvemos locos 🤪", source: "IG DfkrFlzoHYR" , add: "promo-jamoneitor-35" },
+      { src: "assets/video/kit-supervivencia", caption: "Tu kit de supervivencia 🔥", source: "IG Df0DxInuIvG" },
+      { src: "assets/video/apagon", caption: "Que no te sorprenda el apagón 🚨", source: "IG Dfx1wxHlvJm" },
+      { src: "assets/video/suegra", caption: "¿Querés conquistar a tu suegra? 👑", source: "IG DfC0seNoVa7" },
     ],
 
     feed: [
-      { img: "assets/img/ig-Df98OMcuhXH.webp", url: "https://www.instagram.com/p/Df98OMcuhXH/", alt: "Sólo para hermosos: la Cheeseburguer y La Scoobyneta" },
-      { img: "assets/img/ig-Df2marUnKKC.webp", url: "https://www.instagram.com/p/Df2marUnKKC/", alt: "Por si se acaba el mundo: Jamoneitor a 35 Bs" },
-      { img: "assets/img/ig-Df0DxInuIvG.webp", url: "https://www.instagram.com/p/Df0DxInuIvG/", alt: "Tu kit de supervivencia" },
-      { img: "assets/img/ig-Dfx1wxHlvJm.webp", url: "https://www.instagram.com/p/Dfx1wxHlvJm/", alt: "Que no te sorprenda el apagón" },
-      { img: "assets/img/ig-DfphlqNuh8Y.webp", url: "https://www.instagram.com/p/DfphlqNuh8Y/", alt: "Jamoneitor a solo 35 Bs" },
-      { img: "assets/img/ig-DfkrFlzoHYR.webp", url: "https://www.instagram.com/p/DfkrFlzoHYR/", alt: "Tu Jamoneitor a 35 Bs" },
-      { img: "assets/img/ig-DfkMuSflkbP.webp", url: "https://www.instagram.com/p/DfkMuSflkbP/", alt: "Ugo's está preparando algo nuevo" },
-      { img: "assets/img/ig-DfC0seNoVa7.webp", url: "https://www.instagram.com/p/DfC0seNoVa7/", alt: "Conquistá a tu suegra con una pizza de Ugo's" },
+      { img: "assets/img/ig-Df98OMcuhXH.webp", source: "IG Df98OMcuhXH", alt: "Sólo para hermosos: la Cheeseburguer y La Scoobyneta" , add: "cheeseburguer" },
+      { img: "assets/img/ig-Df2marUnKKC.webp", source: "IG Df2marUnKKC", alt: "Por si se acaba el mundo: Jamoneitor a 35 Bs" , add: "promo-jamoneitor-35" },
+      { img: "assets/img/ig-Df0DxInuIvG.webp", source: "IG Df0DxInuIvG", alt: "Tu kit de supervivencia" },
+      { img: "assets/img/ig-Dfx1wxHlvJm.webp", source: "IG Dfx1wxHlvJm", alt: "Que no te sorprenda el apagón" },
+      { img: "assets/img/ig-DfphlqNuh8Y.webp", source: "IG DfphlqNuh8Y", alt: "Jamoneitor a solo 35 Bs" , add: "promo-jamoneitor-35" },
+      { img: "assets/img/ig-DfkrFlzoHYR.webp", source: "IG DfkrFlzoHYR", alt: "Tu Jamoneitor a 35 Bs" , add: "promo-jamoneitor-35" },
+      { img: "assets/img/ig-DfkMuSflkbP.webp", source: "IG DfkMuSflkbP", alt: "Ugo's está preparando algo nuevo" },
+      { img: "assets/img/ig-DfC0seNoVa7.webp", source: "IG DfC0seNoVa7", alt: "Conquistá a tu suegra con una pizza de Ugo's" },
     ],
 
     // HOME: "¿QUIERES TRABAJAR CON NOSOTROS? CONTÁCTANOS"

@@ -101,14 +101,27 @@
     { cls: "red", kicker: "Combo para compartir", t1: "2 Jamoneitor", t2: "+ Pepsi 2 L", price: star.price, desc: "Dos pizzas familiares de 8 porciones y la Pepsi de 2 litros.", add: star.id,
       media: `<img class="photo" src="assets/hero/slide-2-jamoneitor.webp" width="1000" height="750" alt="Dos pizzas Jamoneitor con Pepsi de 2 litros, 100 Bs" fetchpriority="high">
         <div class="sticker" aria-hidden="true"><svg viewBox="0 0 128 128"><defs><path id="stk" d="M64,64 m-50,0 a50,50 0 1,1 100,0 a50,50 0 1,1 -100,0"/></defs><circle cx="64" cy="64" r="63"/><text><textPath href="#stk">SÓLO PARA HERMOSOS · UGO'S PIZZA ·</textPath></text></svg><b>8<small>PORCIONES</small></b></div>`,
-      terms: "Combos publicados en ugospizzas.com · en sucursal o por WhatsApp" },
+      terms: "8 porciones · tamaño familiar · en sucursal o por WhatsApp" },
     yapaOn && { cls: "cream", light: true, kicker: `Promo de ${U.yapa.month}`, t1: "Jamoneitor", t2: "por La Scoobyneta", price: U.yapa.price, desc: `<s>${money(U.yapa.regular)}</s> · sólo pidiendo por La Scoobyneta, primeras 100 pizzas del día.`, add: U.yapa.id,
       media: `<img class="photo" src="assets/img/pizza-jamoneitor.webp" width="760" height="543" alt="Pizza Jamoneitor"><span class="pricetag">¡Ahorrá ${money(U.yapa.regular - U.yapa.price)}!</span>`,
       terms: `Válido todo ${U.yapa.month} pidiendo por La Scoobyneta (76066200)` },
     { cls: "wine", kicker: "La más vendida", t1: "Cheese", t2: "burguer", price: best.price, desc: "Carne molida, tocino y cheddar sobre masa madre. Familiar de 8 porciones.", add: "cheeseburguer",
       bg: `<img src="assets/hero/cheeseburguer-hd.webp" alt="" width="576" height="1024">`,
       media: `<div class="reelcard"><video muted playsinline loop preload="none" poster="assets/hero/cheeseburguer-hd.webp" data-src="assets/hero/cheeseburguer-hd.mp4" width="576" height="1024"></video></div><div class="blob">¡Probá la más pedida!</div>`,
-      terms: "Precio de carta · ugospizzas.com/menu" },
+      terms: "Precio de carta · tamaño familiar de 8 porciones" },
+    CAT["combo-bruto-tocino"] && { cls: "red", kicker: "Combo bien cargado", t1: "Bruto Tocino", t2: "+ Pepsi 2 L", price: CAT["combo-bruto-tocino"].price, desc: "Tocino, cheddar y orégano sobre masa madre, con la Pepsi de 2 litros.", add: "combo-bruto-tocino",
+      media: `<img class="photo" src="assets/img/combo-bruto-tocino.webp" width="720" height="540" alt="Pizza Bruto Tocino con Pepsi de 2 litros, 65 Bs" loading="lazy">`,
+      terms: "8 porciones · tamaño familiar · en sucursal o por WhatsApp" },
+    CAT.ugos && { cls: "cream", light: true, kicker: "La de la casa", t1: "Ugo's", t2: "borde de salchichas", price: CAT.ugos.price, desc: "Volcán de crema de cheddar al centro, jamón y orégano. La firma de la casa.", add: "ugos",
+      media: `<img class="photo" src="assets/img/pizza-ugos.webp" width="760" height="481" alt="Pizza Ugo's con borde de salchichas y volcán de cheddar" loading="lazy"><span class="pricetag">¡La de la casa!</span>`,
+      terms: "Precio de carta · tamaño familiar de 8 porciones" },
+    CAT["combo-2-salchichonas"] && { cls: "wine", kicker: "Para la junta", t1: "2 Salchichonas", t2: "+ Pepsi 2 L", price: CAT["combo-2-salchichonas"].price, desc: "Dos familiares de salchicha con la Pepsi de 2 litros: 16 porciones.", add: "combo-2-salchichonas",
+      bg: `<img src="assets/img/combo-2-salchichonas.webp" alt="" width="720" height="540" loading="lazy">`,
+      media: `<img class="photo" src="assets/img/combo-2-salchichonas.webp" width="720" height="540" alt="Dos pizzas Salchichona con Pepsi de 2 litros, 100 Bs" loading="lazy">`,
+      terms: "8 porciones cada una · tamaño familiar" },
+    { cls: "red", kicker: "Pizza + gaseosa", t1: "Combos", t2: "familiares", price: Math.min(...U.combos.map((c) => c.price)), desc: "Jamoneitor, Salchichona o Chocluda con su gaseosa de 2 litros. Elegí el tuyo.", add: "combo-jamoneitor",
+      media: `<div class="fan">${["promo-salchichona", "promo-jamoneitor", "promo-chocluda"].map((n, i) => `<img src="assets/img/${n}.webp" width="900" height="889" alt="" loading="lazy" style="--i:${i - 1}">`).join("")}</div>`,
+      terms: "Todos tamaño familiar de 8 porciones", cta2: ["Ver combos", "#combos"] },
   ].filter(Boolean);
   $("#slides").innerHTML = slides.map((s, i) => `
     <article class="slide slide--${s.cls}${i === 0 ? " is-active" : ""}" ${i ? "inert" : ""} aria-roledescription="diapositiva" aria-label="${i + 1} de ${slides.length}" data-light="${s.light ? 1 : 0}">
@@ -118,7 +131,7 @@
           <span class="kicker">${esc(s.kicker)}</span>
           <h2 class="slide__t">${esc(s.t1)}<span>${esc(s.t2)}</span></h2>
           <div class="price"><span class="price__cur">Bs</span><span class="price__n">${s.price}</span><span class="price__d">${s.desc}</span></div>
-          <div class="ctas"><button class="btn btn--mustard btn--lg" data-add="${esc(s.add)}">Sumar al pedido</button><a class="btn ${s.light ? "btn--outline" : "btn--ghost"} btn--lg" href="#carta">Ver la carta</a></div>
+          <div class="ctas"><button class="btn btn--mustard btn--lg" data-add="${esc(s.add)}">Sumar al pedido</button><a class="btn ${s.light ? "btn--outline" : "btn--ghost"} btn--lg" href="${s.cta2 ? s.cta2[1] : "#carta"}">${s.cta2 ? s.cta2[0] : "Ver la carta"}</a></div>
         </div>
         <div class="slide__media">${s.media}</div>
       </div>
@@ -197,7 +210,8 @@
   });
 
   /* ====================== RAILS ====================== */
-  $("#offersRail").innerHTML = U.offers.map((o) => `<a href="${esc(o.href)}" target="_blank" rel="noopener"><img src="${esc(o.img)}" width="900" height="1125" alt="${esc(o.alt)}" loading="lazy"></a>`).join("");
+  const OFFERS = U.offers.filter((o) => !o.add || CAT[o.add]).map((o) => ({ img: o.img, alt: o.alt, add: o.add }));
+  $("#offersRail").innerHTML = OFFERS.map((o, i) => `<a href="#promos" role="button" data-lb="offers" data-i="${i}" aria-label="Ver promo: ${esc(o.alt)}"><img src="${esc(o.img)}" width="900" height="1125" alt="${esc(o.alt)}" loading="lazy"></a>`).join("");
   $$("[data-rail]").forEach((b) => b.addEventListener("click", () => { const r = $("#" + b.dataset.rail); r.scrollBy({ left: Number(b.dataset.dir) * r.clientWidth * .8, behavior: reduced ? "auto" : "smooth" }); }));
   function railArrows() { const r = $("#offersRail"); $(".rail-btn--l").classList.toggle("is-off", r.scrollLeft < 10); $(".rail-btn--r").classList.toggle("is-off", r.scrollLeft + r.clientWidth >= r.scrollWidth - 10); }
   $("#offersRail").addEventListener("scroll", railArrows, { passive: true }); addEventListener("resize", railArrows); railArrows();
@@ -492,13 +506,13 @@
         <p class="lede">En vez de ${money(y.regular)}, si la pedís por La Scoobyneta, el delivery de Ugo's. Aplica para las primeras 100 pizzas del día, todos los días de ${esc(y.month)}.</p>
         <p class="bigprice"><small>Bs</small>${y.price}<s>${money(y.regular)}</s></p>
         <div class="ctas"><button class="btn btn--mustard btn--lg" data-add="${esc(y.id)}">Sumar al pedido</button><a class="btn btn--ghost btn--lg" href="${esc(U.waUrl(U.delivery.whatsapp, "¡Hola Scoobyneta! 🚌 Quiero mi Jamoneitor a 35 Bs"))}" target="_blank" rel="noopener">Llamar a La Scoobyneta</a></div>
-        <p class="fine">Fuente: <a href="${esc(y.url)}" target="_blank" rel="noopener">post de @ugos_pizza</a> · válido hasta el 30 de ${esc(y.month)}.</p>
+        <p class="fine">Válido hasta el 30 de ${esc(y.month)} · primeras 100 pizzas del día.</p>
       </div></div>`;
   }
 
   /* ====================== MENU LIST ====================== */
   $("#menuSub").textContent = `Todas tamaño familiar de 8 porciones, con ${U.base}.`;
-  $("#coins").innerHTML = `<div class="coin"><b>8</b><span>porciones<small>Tamaño familiar</small></span></div><div class="coin"><b>${allPizzas.length}</b><span>sabores en carta<small>ugospizzas.com/menu</small></span></div>`;
+  $("#coins").innerHTML = `<div class="coin"><b>8</b><span>porciones<small>Tamaño familiar</small></span></div><div class="coin"><b>${allPizzas.length}</b><span>sabores en carta<small>Clásicas, especiales y de la casa</small></span></div>`;
   const tabs = [{ id: "all", name: "Todas" }, ...U.menu.map((c) => ({ id: c.id, name: c.name })), { id: "veg", name: "Sin carne" }];
   $("#tabs").innerHTML = tabs.map((t, i) => `<button role="tab" aria-selected="${i === 0}" data-tab="${t.id}">${esc(t.name)}</button>`).join("");
   function renderMenu(tab) {
@@ -516,13 +530,13 @@
 
   /* ====================== COMBOS + FEATURED ====================== */
   const comboShow = [...U.combos].sort((a, b) => (b.star ? 1 : 0) - (a.star ? 1 : 0));
+  /* image-only poster wall: the poster already says name, drink and price */
+  const COMBOS = comboShow.map((c) => ({ img: c.poster || c.img, alt: `${c.name} · ${money(c.price)}`, add: c.id }));
   $("#ccards").innerHTML = comboShow.map((c, i) => `
-    <article class="ccard${c.star ? " ccard--star" : ""} reveal"${i >= 4 ? ' data-more hidden' : ""}>
-      <div class="ccard__ph"><img src="${esc(c.img)}" width="720" height="540" alt="${esc(c.name)}" loading="lazy">${c.tag ? `<span class="badge ccard__tag">${esc(c.tag)}</span>` : ""}</div>
-      <div class="ccard__b"><h3>${esc(c.name)}</h3><p>${esc(c.note)}</p>
-        <div class="ccard__f"><span class="ccard__p"><small>Bs</small>${c.price}</span><button class="plus" data-add="${esc(c.id)}" aria-label="Sumar ${esc(c.name)}">+</button></div></div>
-    </article>`).join("") + `<button class="btn btn--ghost ccards-more" id="combosMore">Ver los ${U.combos.length} combos ↓</button>`;
-  $("#combosMore").addEventListener("click", (e) => { $$("[data-more]").forEach((x) => (x.hidden = false)); e.currentTarget.remove(); });
+    <article class="cposter reveal">
+      <a href="#combos" role="button" data-lb="combos" data-i="${i}" aria-label="Ver ${esc(c.name)}, ${money(c.price)}"><img src="${esc(c.poster || c.img)}" width="900" height="889" alt="${esc(c.name)} a ${money(c.price)}" loading="lazy"></a>
+      <button class="cposter__add" data-add="${esc(c.id)}" aria-label="Sumar ${esc(c.name)} al pedido"><span aria-hidden="true">+</span><b>Sumar</b></button>
+    </article>`).join("");
   $("#featured").innerHTML = U.featured.filter((f) => CAT[f.ref]).map((f) => { const it = CAT[f.ref]; return `
     <article class="fcard reveal">
       <div class="fcard__m">${f.video ? `<video muted playsinline loop autoplay preload="none" poster="${esc(f.img)}" data-src="${esc(f.video)}.mp4" width="540" height="960"></video>` : `<img class="${/pizza-/.test(f.img) ? "cut" : ""}" src="${esc(f.img)}" width="760" height="543" alt="" loading="lazy">`}</div>
@@ -531,7 +545,8 @@
     </article>`; }).join("");
 
   /* ====================== REELS + lazy videos ====================== */
-  $("#reelsRail").innerHTML = U.reels.map((r) => `<a href="${esc(r.url)}" target="_blank" rel="noopener" aria-label="${esc(r.caption)} (abre Instagram)"><video muted playsinline loop preload="none" poster="${esc(r.src)}.webp" data-src="${esc(r.src)}.mp4" width="540" height="960"></video><span>${esc(r.caption)}</span></a>`).join("");
+  const REELS = U.reels.map((r) => ({ video: r.src, caption: r.caption, add: r.add && CAT[r.add] ? r.add : null }));
+  $("#reelsRail").innerHTML = U.reels.map((r, i) => `<a href="#reels" role="button" data-lb="reels" data-i="${i}" aria-label="Ver video: ${esc(r.caption)}"><video muted playsinline loop preload="none" poster="${esc(r.src)}.webp" data-src="${esc(r.src)}.mp4" width="540" height="960"></video><span>${esc(r.caption)}</span></a>`).join("");
   const vio = new IntersectionObserver((ens) => ens.forEach((en) => {
     const v = en.target;
     if (en.isIntersecting && en.intersectionRatio >= .35 && !reduced) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause();
@@ -543,13 +558,54 @@
   $("#storyCopy").innerHTML = `<p class="eyebrow">${esc(S.eyebrow)}</p><h2 class="display" id="storyT">${esc(S.title.split(" ").slice(0, 2).join(" "))} <span class="hl">${esc(S.title.split(" ").slice(2).join(" "))}</span></h2>
     <p>${esc(S.p1)}</p><p>${esc(S.p2)}</p><ul class="tline">${S.timeline.map((t) => `<li><b>${esc(t.k)}</b><span>${esc(t.v)}</span></li>`).join("")}</ul>
     <img class="story__seal" src="assets/img/hecho-bolivia.webp" width="400" height="400" alt="Sello: Hecho en Bolivia, consume lo nuestro" loading="lazy">`;
-  $("#fgrid").innerHTML = U.feed.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener"><img src="${esc(f.img)}" width="900" height="1125" alt="${esc(f.alt)}" loading="lazy"></a>`).join("");
+  const FEED = U.feed.map((f) => ({ img: f.img, alt: f.alt, add: f.add && CAT[f.add] ? f.add : null }));
+  $("#fgrid").innerHTML = FEED.map((f, i) => `<a href="#instagram" role="button" data-lb="feed" data-i="${i}" aria-label="Ver: ${esc(f.alt)}"><img src="${esc(f.img)}" width="900" height="1125" alt="${esc(f.alt)}" loading="lazy"></a>`).join("");
+
+  /* ====================== FRANCHISE LEAD (stays on this site; lands in WhatsApp + the back office) ====================== */
+  $("#frForm").addEventListener("submit", (e) => {
+    e.preventDefault(); const f = e.target; const v = (n) => (f.elements[n].value || "").trim();
+    if (!v("name") || !v("phone")) { $("#frMsg").textContent = "Dejanos tu nombre y un número para escribirte."; return; }
+    const msg = [`¡Hola Ugo's! 😎 Quiero información de franquicias`, `👤 ${v("name")}`, `📱 ${v("phone")}`, v("city") && `📍 Ciudad: ${v("city")}`, v("note") && `📝 ${v("note")}`].filter(Boolean).join("\n");
+    const leads = store.get("ugos_leads", []); leads.unshift({ at: Date.now(), kind: "franquicia", name: v("name"), phone: v("phone"), city: v("city"), note: v("note") }); store.set("ugos_leads", leads.slice(0, 50));
+    window.open(U.waUrl(U.config.callCenter, msg), "_blank", "noopener");
+    $("#frMsg").textContent = "¡Listo! Te abrimos WhatsApp con tu mensaje."; f.reset();
+  });
+
+  /* ====================== LIGHTBOX: promos, reels and posts open here, never on another site ====================== */
+  const LB = (function () {
+    const box = $("#lbox"), media = $("#lboxMedia"), bar = $("#lboxBar"); let list = [], at = 0, last = null;
+    const sets = { offers: OFFERS, reels: REELS, feed: FEED, combos: COMBOS };
+    function show(i) {
+      at = (i + list.length) % list.length; const it = list[at]; const p = it.add && CAT[it.add];
+      media.innerHTML = it.video
+        ? `<video src="${esc(it.video)}.mp4" poster="${esc(it.video)}.webp" controls autoplay playsinline loop></video>`
+        : `<img src="${esc(it.img)}" alt="${esc(it.alt || "")}">`;
+      bar.innerHTML = `<div class="lbox__t"><small>${at + 1} / ${list.length}</small><b>${esc(it.caption || it.alt || "")}</b></div>
+        ${p ? `<div class="lbox__buy"><span class="lbox__p">${p.regular ? `<s>${money(p.regular)}</s> ` : ""}${money(p.price)}</span><button class="btn btn--mustard" data-add="${esc(p.id)}">Sumar al pedido</button><button class="btn btn--ghost" data-lb-order="${esc(p.id)}">Pedir ahora →</button></div>` : `<a class="btn btn--ghost" href="#carta" data-lb-close>Ver la carta</a>`}`;
+      $("#lboxPrev").hidden = $("#lboxNext").hidden = list.length < 2;
+    }
+    function open(set, i) { list = sets[set] || []; if (!list.length) return; last = document.activeElement; box.hidden = false; document.body.classList.add("lb-open"); show(i); $("#lboxX").focus(); updateBars(); }
+    function close() { if (box.hidden) return; media.innerHTML = ""; box.hidden = true; document.body.classList.remove("lb-open"); if (last) last.focus(); updateBars(); }
+    document.addEventListener("click", (e) => {
+      const t = e.target.closest("[data-lb]"); if (t) { e.preventDefault(); open(t.dataset.lb, Number(t.dataset.i)); return; }
+      if (box.hidden) return;
+      const o = e.target.closest("[data-lb-order]");
+      if (o) { addToCart(o.dataset.lbOrder); close(); gotoStep(2, { focus: false }); $("#pedir").scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); return; }
+      if (e.target.closest("[data-lb-close]") || e.target === box || e.target.closest("#lboxX")) close();
+    });
+    $("#lboxPrev").addEventListener("click", () => show(at - 1)); $("#lboxNext").addEventListener("click", () => show(at + 1));
+    box.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") show(at + 1); else if (e.key === "ArrowLeft") show(at - 1); });
+    let sx = null;
+    media.addEventListener("touchstart", (e) => (sx = e.touches[0].clientX), { passive: true });
+    media.addEventListener("touchend", (e) => { if (sx == null) return; const d = e.changedTouches[0].clientX - sx; if (Math.abs(d) > 50) show(at + (d < 0 ? 1 : -1)); sx = null; });
+    return { close, isOpen: () => !box.hidden };
+  })();
   $("#jobsT").textContent = U.jobs.title; $("#jobsP").textContent = U.jobs.text;
   $("#jobsBtn").href = U.waUrl(U.config.callCenter, U.jobs.wa);
   const groups = [
     ["Productos", [["La carta gira", "#carta"], ["Carta completa", "#menu"], ["Combos", "#combos"], ["La más vendida", "#combos"]]],
     ["Promos", [["Promos vigentes", "#promos"], ...(yapaOn ? [[`Jamoneitor ${money(U.yapa.price)}`, "#yapa"]] : []), ["Instagram", U.config.instagram]]],
-    ["Pedidos", [["Pedí en 4 pasos", "#pedir"], ["La Scoobyneta", U.waUrl(U.delivery.whatsapp, "¡Hola Scoobyneta! 🚌")], ["Call center 60007071", U.waUrl(U.config.callCenter, "¡Hola Ugo's! 😎")], ["Franquicias", U.config.franchises]]],
+    ["Pedidos", [["Pedí en 4 pasos", "#pedir"], ["La Scoobyneta", U.waUrl(U.delivery.whatsapp, "¡Hola Scoobyneta! 🚌")], ["Call center 60007071", U.waUrl(U.config.callCenter, "¡Hola Ugo's! 😎")], ["Franquicias", "#pale"]]],
     ["Sucursales", U.branches.map((b) => [b.name, b.maps])],
   ];
   $("#fgroups").innerHTML = groups.map(([t, ls]) => `<details><summary>${esc(t)}</summary><ul>${ls.map(([n, h]) => `<li><a href="${esc(h)}"${/^http/.test(h) ? ' target="_blank" rel="noopener"' : ""}>${esc(n)}</a></li>`).join("")}</ul></details>`).join("");
@@ -737,7 +793,7 @@
   const vo = new IntersectionObserver((ens) => { ens.forEach((en) => { vis[en.target.dataset.v] = en.isIntersecting; }); updateBars(); }, { threshold: .05 });
   [["hero", ".hero"], ["funnel", "#pedir"], ["footer", "#footer"]].forEach(([k, s]) => { const el = $(s); el.dataset.v = k; vo.observe(el); });
   function updateBars() {
-    const overlay = !$("#chat").hidden || !$("#drawer").hidden || !$("#pdetail").hidden;
+    const overlay = !$("#chat").hidden || !$("#drawer").hidden || !$("#pdetail").hidden || !$("#lbox").hidden;
     $("#mbar").classList.toggle("is-hidden", overlay || vis.hero || vis.funnel || vis.footer);
     $("#fab").classList.toggle("is-hidden", overlay || vis.footer);
   }
@@ -902,7 +958,8 @@
   /* ====================== keyboard: Esc ====================== */
   addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
-    if (Spin.isOpen()) Spin.closeDetail();
+    if (LB.isOpen()) LB.close();
+    else if (Spin.isOpen()) Spin.closeDetail();
     else if (!$("#drawer").hidden) closeDrawer();
     else if (!chat.hidden) closeChat();
     else if (!$("#mnav").hidden) burger.click();

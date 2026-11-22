@@ -33,7 +33,7 @@
   <link rel="preload" as="image" href="assets/hero/slide-2-jamoneitor.webp" fetchpriority="high">
 
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"Restaurant","name":"Ugo's Pizza","slogan":"Sólo para hermosos","servesCuisine":["Pizza"],"priceRange":"Bs 44 – Bs 100","url":"https://ugos-pizza-2.vercel.app/","logo":"https://ugos-pizza-2.vercel.app/assets/brand/logo-512.png","image":"https://ugos-pizza-2.vercel.app/assets/brand/ugos-logo-share.jpg","telephone":"+59160007071","address":{"@type":"PostalAddress","addressLocality":"Santa Cruz de la Sierra","addressCountry":"BO"},"sameAs":["https://www.instagram.com/ugos_pizza/","https://www.ugospizzas.com/"]}
+  {"@context":"https://schema.org","@type":"Restaurant","name":"Ugo's Pizza","slogan":"Sólo para hermosos","servesCuisine":["Pizza"],"priceRange":"Bs 44 – Bs 100","url":"https://ugos-pizza-2.vercel.app/","logo":"https://ugos-pizza-2.vercel.app/assets/brand/logo-512.png","image":"https://ugos-pizza-2.vercel.app/assets/brand/ugos-logo-share.jpg","telephone":"+59160007071","address":{"@type":"PostalAddress","addressLocality":"Santa Cruz de la Sierra","addressCountry":"BO"},"sameAs":["https://www.instagram.com/ugos_pizza/"]}
   </script>
 </head>
 <body>
@@ -104,7 +104,6 @@
         <div class="rail offers__rail" id="offersRail"></div>
         <button class="rail-btn rail-btn--r" data-rail="offersRail" data-dir="1" aria-label="Siguiente">›</button>
       </div>
-      <div class="wrap center"><a class="ulink" href="https://www.instagram.com/ugos_pizza/" target="_blank" rel="noopener">Ver todas las promos ↗</a></div>
     </section>
 
     <!-- 7. Weekly promos (rendered only if data.weekly has items) -->
@@ -180,11 +179,11 @@
         <div class="shead shead--light">
           <p class="eyebrow">Combos familiares</p>
           <h2 class="display" id="combosT">Pizza + gaseosa, <span class="hl">8 porciones</span></h2>
-          <p class="sub">Todos en tamaño familiar. Los precios son los de nuestras promos publicadas.</p>
+          <p class="sub">Tocá un combo para verlo grande, o sumalo directo con el +.</p>
         </div>
         <div class="ccards" id="ccards"></div>
         <div class="feat" id="featured"></div>
-        <p class="fine" id="combosFine">Combos según ugospizzas.com · La promo de Jamoneitor a Bs 35 aplica sólo pidiendo por La Scoobyneta.</p>
+        <p class="fine" id="combosFine">Todos tamaño familiar de 8 porciones · La promo de Jamoneitor a Bs 35 aplica sólo pidiendo por La Scoobyneta.</p>
       </div>
     </section>
 
@@ -305,8 +304,13 @@
         <div>
           <p class="eyebrow">Franquicias</p>
           <h2 class="display">¿Querés tu propia <span class="hl">sucursal</span>?</h2>
-          <p class="sub">Somos una cadena 100% boliviana. Conocé la ficha técnica y escribinos desde la página de franquicias.</p>
-          <a class="btn btn--dark btn--lg" href="https://ugospizzas.com/franquicias/" target="_blank" rel="noopener">Quiero una franquicia ↗</a>
+          <p class="sub">Somos una cadena 100% boliviana. Dejanos tus datos y te escribimos con la ficha técnica.</p>
+          <form class="frform" id="frForm" novalidate>
+            <div class="frform__row"><label>Nombre<input name="name" autocomplete="name" maxlength="60" required></label><label>Celular<input name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" required></label></div>
+            <div class="frform__row"><label>Ciudad<input name="city" maxlength="40" placeholder="Santa Cruz, Cochabamba…"></label><label>Comentario <em>opcional</em><input name="note" maxlength="140" placeholder="¿Tenés local?"></label></div>
+            <button class="btn btn--dark btn--lg" type="submit">Quiero una franquicia →</button>
+            <p class="frform__msg" id="frMsg" role="status"></p>
+          </form>
         </div>
       </div>
     </section>
@@ -406,6 +410,13 @@
     <a class="btn btn--mustard" href="#pedir">Pedí por WhatsApp →</a>
   </div>
 
+  <div class="lbox" id="lbox" role="dialog" aria-modal="true" aria-label="Promo" hidden>
+    <button class="lbox__x" id="lboxX" aria-label="Cerrar">✕</button>
+    <button class="lbox__nav lbox__nav--l" id="lboxPrev" aria-label="Anterior">‹</button>
+    <div class="lbox__media" id="lboxMedia"></div>
+    <button class="lbox__nav lbox__nav--r" id="lboxNext" aria-label="Siguiente">›</button>
+    <div class="lbox__bar" id="lboxBar"></div>
+  </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="js/data.js"></script>
