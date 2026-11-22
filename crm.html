@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Ugo's CRM</title>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/crm.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="side" id="side">
+      <a class="side__brand" href="#/panel"><img src="assets/img/logo.png" width="36" height="36" alt=""><span><b>Ugo's</b><small>Back office</small></span></a>
+      <nav class="side__nav" id="nav" aria-label="Secciones"></nav>
+      <div class="side__foot">
+        <a href="index.html" class="side__site" target="_blank" rel="noopener">Ver la web ↗</a>
+        <span id="sideClock" class="side__clock"></span>
+      </div>
+    </aside>
+    <div class="main">
+      <header class="top">
+        <button class="top__menu" id="menuBtn" aria-label="Menú">☰</button>
+        <h1 class="top__t" id="title">Panel</h1>
+        <div class="top__tools">
+          <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar cliente, pedido o teléfono…" autocomplete="off"></label>
+          <select id="branchSel" aria-label="Sucursal"></select>
+          <button class="btn btn--brand" id="newOrderBtn"><span aria-hidden="true">+</span> Nuevo pedido</button>
+        </div>
+        <div class="qres" id="qres" hidden></div>
+      </header>
+      <div class="demo" id="demoBar" hidden>
+        <span><b>Datos de demostración.</b> <span class="hide-sm">Pedidos, clientes, personal y stock de ejemplo para que veas el sistema funcionando. </span>La carta, precios y sucursales son los reales.</span>
+        <button class="btn btn--sm" data-act="clean">Empezar en limpio</button>
+      </div>
+      <main class="view" id="view" tabindex="-1"></main>
+    </div>
+  </div>
+  <div class="drawer" id="drawer" hidden><div class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="drawerT"><button class="drawer__x" data-close aria-label="Cerrar">✕</button><div id="drawerBody"></div></div></div>
+  <div class="modal" id="modal" hidden><div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modalT"><button class="drawer__x" data-close aria-label="Cerrar">✕</button><div id="modalBody"></div></div></div>
+  <div class="tip" id="tip" role="tooltip" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="js/data.js"></script>
+  <script type="module" src="js/crm/app.js"></script>
+</body>
+</html>

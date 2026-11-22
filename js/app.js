@@ -785,6 +785,13 @@
   F.addEventListener("submit", (e) => e.preventDefault());
   $("#sendWa").addEventListener("click", () => {
     const d = details(); if (Object.keys(d.cart).length) saveOrder({ id: null, at: Date.now(), branch: d.dest.id, service: d.intent, cart: { ...cart } });
+    // hand the order to the back office inbox (js/crm/store.js picks it up)
+    if (Object.keys(d.cart).length) {
+      const inbox = store.get("ugos_crm_inbox", []);
+      inbox.push({ webId: `W${Date.now().toString(36)}`, at: Date.now(), name: d.name, address: d.address, reference: d.reference, pin: d.pin, note: d.note, when: d.when, service: d.intent,
+        branch: d.dest.kind === "callcenter" ? (d.intent === "delivery" ? U.delivery.id : U.branches[0].id) : d.dest.id, cart: { ...d.cart } });
+      store.set("ugos_crm_inbox", inbox.slice(-50));
+    }
   });
   renderFunnelCart(); gotoStep(1, { focus: false });
 

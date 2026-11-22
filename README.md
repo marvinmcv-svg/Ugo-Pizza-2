@@ -29,6 +29,29 @@ tests/tools.test.js tests de las herramientas (node:test)
 assets/             fotos, reels y marca descargados de las redes y la web de Ugo's (nada generado)
 ```
 
+## Back office (CRM) · `/crm`
+
+Panel interno para operar la cadena. No está enlazado desde la web pública y tiene `noindex`.
+
+| Módulo | Qué hace |
+|---|---|
+| Panel | Ventas, pedidos y ticket de hoy vs. la semana pasada, ventas por hora, 14 días, sucursales, canales, lo que más sale, alertas (pedidos atrasados, stock bajo, cobros, leads) |
+| Pedidos | Tablero Nuevo → Confirmado → En horno → Listo → En camino → Entregado con timers y SLA, arrastrar y soltar, detalle, cobro, ticket imprimible, aviso al cliente por WhatsApp, historial + CSV |
+| Nuevo pedido | Punto de venta: cliente (busca o crea), sucursal, canal, servicio, productos, cupones, pago, nota |
+| Cocina | Pantalla de cocina por sucursal (tocar para avanzar, pantalla completa) |
+| Delivery | Para despachar, en camino, repartidores y asignación |
+| Clientes | Ficha, historial, gasto, segmentos (VIP, frecuente, ocasional, nuevo, dormido), puntos y canje, etiquetas, notas, CSV |
+| Personal | Equipo por sucursal, turnos de la semana con horas y costo, entrada/salida |
+| Inventario | Stock por sucursal con días de cobertura, recetas y costos/márgenes, descuento automático al entrar al horno, compras sugeridas y órdenes, mermas, conteo físico |
+| Marketing | Campañas de WhatsApp por segmento, cupones, rendimiento de promos y combos, reglas de puntos |
+| Reportes | Por período y sucursal: ventas, ticket, margen, mapa de calor día × hora, canales, pagos, productos, CSV |
+| Leads | Formularios de franquicia de la web |
+
+- Archivos: `crm.html`, `css/crm.css`, `js/crm/store.js` (datos), `js/crm/ui.js` (componentes y gráficos), `js/crm/app.js` (pantallas).
+- La carta, precios y sucursales salen de `js/data.js` (la misma fuente que la web).
+- **Datos:** hoy viven en el navegador (`localStorage`), con datos de demostración la primera vez ("Empezar en limpio" los borra). Los pedidos y leads de la web entran solos **si se hacen en el mismo navegador**. Para varias sucursales y dispositivos a la vez hace falta una base de datos: todo pasa por `load()`/`save()` en `store.js`, que es lo único a reemplazar. También hace falta login real antes de usarlo con datos de clientes.
+- Recetas y costos de insumos son estimaciones editables (Inventario → Recetas y costos).
+
 ## Correr local
 
 ```bash
