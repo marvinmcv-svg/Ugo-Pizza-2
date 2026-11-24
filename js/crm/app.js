@@ -349,12 +349,13 @@ VIEWS.pedidos = {
         if (col.dataset.col === "camino" && !o.riderId) { assignRider(o, true); return; } S.setStatus(o, col.dataset.col); toast(`${o.id} → ${st(col.dataset.col).name}`); });
     });
     $$(".ocard").forEach((c) => c.addEventListener("click", (e) => { if (!e.target.closest("button,a")) openOrder(c.dataset.id); }));
+    $$(".ocard").forEach((c) => c.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target === c) { e.preventDefault(); openOrder(c.dataset.id); } }));
     tick();
   },
 };
 function ocard(o) {
   const c = cust(o.customerId); const n = S.nextStatus(o); const late = lateness(o);
-  return `<article class="ocard${late === "late" ? " is-late" : ""}" data-id="${o.id}"><div class="ocard__t"><b>${o.id}</b><span class="timer" data-since="${o.at}">${mmss(Date.now() - o.at)}</span></div>
+  return `<article class="ocard${late === "late" ? " is-late" : ""}" data-id="${o.id}" tabindex="0" aria-label="Pedido ${o.id}, ${esc(c ? c.name : "Mostrador")}"><div class="ocard__t"><b>${o.id}</b><span class="timer" data-since="${o.at}">${mmss(Date.now() - o.at)}</span></div>
     <div class="ocard__c">${esc(c ? c.name : "Mostrador")}</div><div class="ocard__i">${itemsText(o)}</div>
     <div class="ocard__f"><span class="pill">${SERVICES[o.service]}</span><span class="pill pill--brand">${CHANNELS[o.channel]}</span>${!state.branch ? `<small class="muted">${esc(branchName(o.branch))}</small>` : ""}<span class="total num">${money(o.total)}</span></div>
     ${o.status === "camino" && o.riderId ? `<small class="muted">🛵 ${esc(staff(o.riderId)?.name || "")}</small>` : ""}

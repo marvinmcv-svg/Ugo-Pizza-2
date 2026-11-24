@@ -58,7 +58,7 @@ export function bars(data, { h = 220, color = "var(--seq)", refColor = "var(--in
   }
   data.forEach((d, i) => { s += `<rect class="hit" x="${P.l + i * bw}" y="${P.t}" width="${bw}" height="${ih}" data-k="${i}" data-tip="${esc(d.tip || `${d.label}: ${fmtV(d.v)}`)}"/>`; });
   const legend = refName ? `<div class="legend"><span><i style="background:${color}"></i>${esc(data.name || "Hoy")}</span><span><i style="background:none;border-top:2px dashed ${refColor};height:0;border-radius:0"></i>${esc(refName)}</span></div>` : "";
-  return `<div class="chart"><svg viewBox="0 0 ${W} ${h}" role="img">${s}</svg>${legend}</div>`;
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${h}" role="img" aria-label="${esc(data.map((d) => `${d.label}: ${fmtV(d.v)}`).join(", "))}">${s}</svg>${legend}</div>`;
 }
 
 /** area + line, one series. data [{label, v, tip}] */
@@ -72,7 +72,7 @@ export function line(data, { h = 200, color = "var(--seq)", fmtV = short, every 
   data.forEach((d, i) => { if (i % every === 0 || i === data.length - 1) s += `<text class="ax" x="${x(i)}" y="${h - 6}" text-anchor="middle">${d.label}</text>`; });
   const bw = iw / Math.max(1, data.length - 1);
   data.forEach((d, i) => { s += `<circle class="mk" data-k="${i}" cx="${x(i)}" cy="${y(d.v)}" r="4" fill="${color}" stroke="var(--paper)" stroke-width="2" opacity="${i === data.length - 1 ? 1 : 0}"/><rect class="hit" x="${x(i) - bw / 2}" y="${P.t}" width="${bw}" height="${ih}" data-k="${i}" data-tip="${esc(d.tip || `${d.label}: ${fmtV(d.v)}`)}"/>`; });
-  return `<div class="chart chart--line"><svg viewBox="0 0 ${W} ${h}" role="img">${s}</svg></div>`;
+  return `<div class="chart chart--line"><svg viewBox="0 0 ${W} ${h}" role="img" aria-label="${esc(data.map((d) => `${d.label}: ${fmtV(d.v)}`).join(", "))}">${s}</svg></div>`;
 }
 
 /** horizontal ranked bars (single series) as HTML rows */

@@ -91,7 +91,8 @@
   burger.addEventListener("click", () => { const open = burger.getAttribute("aria-expanded") !== "true"; burger.setAttribute("aria-expanded", open); $("#mnav").hidden = !open; document.body.style.overflow = open ? "hidden" : ""; });
   $("#mnav").addEventListener("click", (e) => { if (e.target.closest("a")) { burger.setAttribute("aria-expanded", "false"); $("#mnav").hidden = true; document.body.style.overflow = ""; } });
   const hdr = $("#hdr");
-  const onScroll = () => { hdr.classList.toggle("is-solid", scrollY > parseInt(getComputedStyle(document.documentElement).getPropertyValue("--tick")) || scrollY > 48); };
+  /* once scrolled, the header docks at top:0 and the ticker slides away (it used to stay on top and cover the header buttons) */
+  const onScroll = () => { const solid = scrollY > parseInt(getComputedStyle(document.documentElement).getPropertyValue("--tick")) || scrollY > 48; hdr.classList.toggle("is-solid", solid); document.documentElement.classList.toggle("is-scrolled", solid); };
   addEventListener("scroll", onScroll, { passive: true }); onScroll();
 
   /* ====================== HERO ====================== */
