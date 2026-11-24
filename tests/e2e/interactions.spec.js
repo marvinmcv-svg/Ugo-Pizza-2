@@ -139,6 +139,7 @@ test("carrito: abrir, sumar, quitar y seguir al embudo", async ({ page }) => {
   const drawer = page.locator("#drawer");
   await expect(drawer).toBeVisible();
   await expect(page.locator("#drawerX")).toBeFocused();
+  await page.waitForTimeout(450); // slide-in animation
   await noHorizontalScroll(page);
   await drawer.locator("[data-q='1']").first().click();
   await expect(drawer.locator(".qty span").first()).toHaveText("2");
