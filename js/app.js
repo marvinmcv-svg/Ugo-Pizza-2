@@ -53,8 +53,8 @@
 
   /* drawer */
   let lastFocus = null;
-  function openDrawer() { lastFocus = document.activeElement; $("#drawer").hidden = false; $("#scrim").hidden = false; $("#drawerX").focus(); updateBars(); }
-  function closeDrawer() { $("#drawer").hidden = true; $("#scrim").hidden = true; if (lastFocus) lastFocus.focus(); updateBars(); }
+  function openDrawer() { lastFocus = document.activeElement; $("#drawer").hidden = false; $("#scrim").hidden = false; document.body.classList.add("drawer-open"); $("#drawerX").focus(); updateBars(); }
+  function closeDrawer() { $("#drawer").hidden = true; $("#scrim").hidden = true; document.body.classList.remove("drawer-open"); if (lastFocus) lastFocus.focus(); updateBars(); }
   $("#cartBtn").addEventListener("click", openDrawer);
   $("#mbarCart").addEventListener("click", openDrawer);
   $("#drawerX").addEventListener("click", closeDrawer);
@@ -88,8 +88,18 @@
   const navHtml = NAV.map(([t, h]) => `<a href="${h}">${t}</a>`).join("") + `<a href="#" class="pill__ai" data-open-chat>Ugo·IA ✨</a>`;
   $("#pillMain").innerHTML = navHtml; $("#pillInline").innerHTML = navHtml; $("#mnavList").innerHTML = navHtml;
   const burger = $("#burger");
-  burger.addEventListener("click", () => { const open = burger.getAttribute("aria-expanded") !== "true"; burger.setAttribute("aria-expanded", open); $("#mnav").hidden = !open; document.body.style.overflow = open ? "hidden" : ""; });
-  $("#mnav").addEventListener("click", (e) => { if (e.target.closest("a")) { burger.setAttribute("aria-expanded", "false"); $("#mnav").hidden = true; document.body.style.overflow = ""; } });
+  const BURGER_ICON = { open: '<path d="M6 6l12 12M18 6L6 18"/>', closed: '<path d="M4 7h16M4 12h16M4 17h16"/>' };
+  function setMenu(open) {
+    burger.setAttribute("aria-expanded", open); burger.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+    $("svg", burger).innerHTML = open ? BURGER_ICON.open : BURGER_ICON.closed; $(".ib__lbl", burger).textContent = open ? "Cerrar" : "Menú";
+    /* the header is taller at the top of the page (ticker + two rows): start the links below it, whatever its height */
+    if (open) $("#mnav").style.setProperty("--mnav-top", Math.round(hdr.getBoundingClientRect().bottom) + "px");
+    $("#mnav").hidden = !open; document.body.style.overflow = open ? "hidden" : ""; document.documentElement.classList.toggle("mnav-open", open);
+  }
+  burger.addEventListener("click", () => setMenu(burger.getAttribute("aria-expanded") !== "true"));
+  $("#mnav").addEventListener("click", (e) => { if (e.target.closest("a")) setMenu(false); });
+  /* rotating to a wide screen hides the burger: never leave the page locked behind a hidden menu */
+  matchMedia("(min-width: 861px)").addEventListener("change", (e) => { if (e.matches && burger.getAttribute("aria-expanded") === "true") setMenu(false); });
   const hdr = $("#hdr");
   /* once scrolled, the header docks at top:0 and the ticker slides away (it used to stay on top and cover the header buttons) */
   const onScroll = () => { const solid = scrollY > parseInt(getComputedStyle(document.documentElement).getPropertyValue("--tick")) || scrollY > 48; hdr.classList.toggle("is-solid", solid); document.documentElement.classList.toggle("is-scrolled", solid); };
@@ -421,9 +431,9 @@
         ${combo ? `<div class="pd__combo"><img src="${esc(combo.img)}" width="720" height="540" alt=""><div><small>Combo</small><br><b>${esc(combo.name)}</b> · ${money(combo.price)}</div><button class="btn btn--mustard" data-add="${esc(combo.id)}">Sumar</button></div>` : ""}
         <button class="btn btn--red btn--lg btn--block pd__cta" data-add="${esc(p.id)}" data-close-pd>Añadir al pedido · ${money(p.price)}</button>`;
       pdLast = document.activeElement;
-      $("#pdetail").hidden = false; $("#pdScrim").hidden = false; $("#pdX").focus(); updateBars();
+      $("#pdetail").hidden = false; $("#pdScrim").hidden = false; document.body.classList.add("pd-open"); $("#pdX").focus(); updateBars();
     }
-    function closeDetail() { $("#pdetail").hidden = true; $("#pdScrim").hidden = true; if (pdLast) pdLast.focus(); updateBars(); }
+    function closeDetail() { $("#pdetail").hidden = true; $("#pdScrim").hidden = true; document.body.classList.remove("pd-open"); if (pdLast) pdLast.focus(); updateBars(); }
     $("#pdX").addEventListener("click", closeDetail); $("#pdScrim").addEventListener("click", closeDetail);
     $("#pdetail").addEventListener("click", (e) => { if (e.target.closest("[data-close-pd]") || e.target.closest("[data-add]")) setTimeout(closeDetail, 50); });
     copy.addEventListener("click", (e) => { const d = e.target.closest("[data-detail]"); if (d) openDetail(Number(d.dataset.detail)); });
@@ -722,6 +732,7 @@
       if (!val("name")) return { msg: "¿Cómo te llamás?", field: "[name=name]" };
       if (it === "pickup" && [U.delivery.id, "callcenter"].includes(val("branch"))) return { msg: "Elegí la sucursal donde vas a recoger.", field: "#fBranchCards" };
       if (it === "delivery" && !val("address") && !geoPin && val("branch") !== "callcenter") return { msg: "Necesitamos tu dirección (o tu ubicación) para el delivery.", field: "[name=address]" };
+      if (it !== "event" && F.querySelector("input[name=when]:checked").value === "later" && !val("time")) return { msg: "¿Para qué hora la programamos?", field: "[name=time]" };
       if (cart[U.yapa && U.yapa.id] && val("branch") !== U.delivery.id) return { msg: `La Jamoneitor a ${money(U.yapa.price)} es sólo por La Scoobyneta (delivery).`, field: "#fBranchCards" };
     }
     return null;
@@ -970,7 +981,7 @@
     else if (Spin.isOpen()) Spin.closeDetail();
     else if (!$("#drawer").hidden) closeDrawer();
     else if (!chat.hidden) closeChat();
-    else if (!$("#mnav").hidden) burger.click();
+    else if (!$("#mnav").hidden) { setMenu(false); burger.focus(); }
   });
 
   /* ====================== REVEAL ====================== */

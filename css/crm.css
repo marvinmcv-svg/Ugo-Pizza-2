@@ -98,6 +98,7 @@ textarea.in { width: 100%; resize: vertical; }
 .delta--up { color: var(--good); } .delta--down { color: var(--bad); }
 .stat--hero { background: var(--wine); color: var(--cream); border-color: var(--wine); }
 .stat--hero .stat__k, .stat--hero .stat__d { color: rgba(251,246,233,.65); }
+.stat--hero .muted { color: rgba(251,246,233,.72); }
 .stat--hero .stat__v { color: var(--mustard); }
 .stat--hero .delta--up { color: #6ee59a; } .stat--hero .delta--down { color: #ff9b8f; }
 

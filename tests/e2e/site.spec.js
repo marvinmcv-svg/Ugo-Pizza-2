@@ -62,7 +62,9 @@ test.describe("Sitio público · calidad", () => {
     await visit(page);
     await scrollThrough(page);
     await page.evaluate(() => scrollTo(0, 0));
-    await page.waitForTimeout(400);
+    // the spin table's showcase lap fades its copy in and out; let it finish so axe never samples half-faded text
+    await page.waitForFunction(() => [...document.querySelectorAll("#spinCopy .anim")].every((el) => !el.getAnimations().some((a) => a.playState === "running")), null, { timeout: 8000 });
+    await page.waitForTimeout(4000);
     const res = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
     const bad = res.violations.filter((v) => ["critical", "serious"].includes(v.impact));
     const msg = bad.map((v) => `${v.impact} ${v.id}: ${v.help}\n   ${v.nodes.slice(0, 5).map((n) => n.target.join(" ")).join("\n   ")}`).join("\n");

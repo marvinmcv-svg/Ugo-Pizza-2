@@ -355,3 +355,64 @@ test("pie de página: grupos desplegables y enlaces", async ({ page }) => {
   expect(await page.locator("#ftrWa").getAttribute("href")).toMatch(/^https:\/\/wa\.me\//);
   expect(await page.locator("#ftrPhone").getAttribute("href")).toMatch(/^tel:/);
 });
+
+/* ---------- regressions found in the Nov 2026 audit ---------- */
+test("menú móvil: los enlaces empiezan debajo del header y nada los tapa", async ({ page }) => {
+  const burger = page.locator("#burger");
+  test.skip(!(await burger.isVisible()), "sin hamburguesa en este ancho");
+  await burger.click();
+  await expect(burger).toHaveAttribute("aria-expanded", "true");
+  await expect(burger.locator(".ib__lbl")).toHaveText("Cerrar");
+  const hdrBottom = await page.evaluate(() => document.querySelector("#hdr").getBoundingClientRect().bottom);
+  const first = await page.locator("#mnavList a").first().boundingBox();
+  expect(first.y).toBeGreaterThanOrEqual(hdrBottom);
+  await page.locator("#mnavList a").first().click(); // used to be intercepted by the header
+  await expect(page.locator("#mnav")).toBeHidden();
+  await expect(burger.locator(".ib__lbl")).toHaveText("Menú");
+});
+
+test("lightbox: el texto y los botones no tapan la imagen", async ({ page }) => {
+  await page.locator("#promos").scrollIntoViewIfNeeded();
+  await page.locator("#offersRail a").first().click();
+  const img = page.locator("#lboxMedia img");
+  await expect(img).toBeVisible();
+  await expect.poll(() => img.evaluate((i) => i.complete && i.naturalWidth > 0)).toBe(true);
+  const [m, b] = await Promise.all([img.boundingBox(), page.locator("#lboxBar").boundingBox()]);
+  const overlap = m.x < b.x + b.width && b.x < m.x + m.width && m.y < b.y + b.height - 1 && b.y < m.y + m.height - 1;
+  expect(overlap, `imagen ${JSON.stringify(m)} vs barra ${JSON.stringify(b)}`).toBe(false);
+});
+
+test("aviso (toast) entra en la pantalla y el carrito bloquea el scroll de fondo", async ({ page }) => {
+  await page.locator("#dots button").first().click();
+  await page.locator(".slide.is-active [data-add]").click();
+  const t = page.locator("#toast");
+  await expect(t).toHaveClass(/is-on/);
+  const vw = await page.evaluate(() => document.documentElement.clientWidth);
+  const box = await t.boundingBox();
+  expect(box.x).toBeGreaterThanOrEqual(0); expect(box.x + box.width).toBeLessThanOrEqual(vw + 1);
+  expect(box.height, "una o dos líneas, no una columna angosta").toBeLessThan(80);
+  await page.locator("#cartBtn").click();
+  await expect(page.locator("body")).toHaveClass(/drawer-open/);
+  await page.keyboard.press("Escape");
+  await expect(page.locator("body")).not.toHaveClass(/drawer-open/);
+});
+
+test("embudo: 'Programar' pide la hora", async ({ page }) => {
+  const F = page.locator("#funnel");
+  await F.scrollIntoViewIfNeeded();
+  await F.locator('.fstep[data-step="1"] [data-next]').click();
+  await F.locator("#fPicker .pk__add").first().click();
+  // the stepper must not cover the price
+  const [st, pr] = await Promise.all([F.locator("#fPicker .pk.is-in .stepper").boundingBox(), F.locator("#fPicker .pk.is-in .pk__p").boundingBox()]);
+  expect(st.y).toBeGreaterThanOrEqual(pr.y + pr.height - 1);
+  await F.locator('.fstep[data-step="2"] [data-next]').click();
+  await F.locator("[name=name]").fill("Ana");
+  await F.locator("[name=address]").fill("Calle 1");
+  await F.locator(".fseg label").nth(1).click();
+  await F.locator('.fstep[data-step="3"] [data-next]').click();
+  await expect(page.locator("#fMsg")).toHaveText(/hora/);
+  await F.locator("[name=time]").fill("20:30");
+  await F.locator('.fstep[data-step="3"] [data-next]').click();
+  await expect(F.locator('.fstep[data-step="4"]')).toBeVisible();
+  await expect(page.locator("#review")).toContainText("20:30");
+});
