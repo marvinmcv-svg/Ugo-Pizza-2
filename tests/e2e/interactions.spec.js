@@ -177,6 +177,8 @@ test("embudo: validaciones guían al usuario", async ({ page }) => {
   await expect(F.locator('.fstep[data-step="2"]')).toBeVisible();
   await F.locator('.fstep[data-step="2"] [data-next]').click();
   await expect(page.locator("#fMsg")).toHaveText(/al menos una/);
+  // under heavy CPU load the step can still be sliding in: click only once it has settled
+  await page.waitForFunction(() => !document.querySelector('.fstep[data-step="2"]').getAnimations({ subtree: true }).some((a) => a.playState === "running"));
   await F.locator("#fPicker .pk__add").first().click();
   await expect(page.locator("#fMsg")).toHaveText("");
   await F.locator('.fstep[data-step="2"] [data-next]').click();
@@ -267,6 +269,7 @@ test("embudo: evento y consulta", async ({ page }) => {
   await page.locator("#stepsBar [data-goto='1']").click();
   await F.locator(".icard:has(input[value=question])").click();
   await expect(F.locator("[name=qTopic]")).toBeVisible();
+  await page.waitForFunction(() => !document.querySelector('.fstep[data-step="2"]').getAnimations({ subtree: true }).some((a) => a.playState === "running"));
   await F.locator("[data-open-chat]").click();
   await expect(page.locator("#chat")).toBeVisible();
 });
