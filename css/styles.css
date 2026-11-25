@@ -114,7 +114,7 @@ input, select, textarea { font: inherit; }
 .hdr.is-solid .hdr__row2 { display: none; }
 .hdr.is-solid .pill--inline { display: flex; padding: 4px; box-shadow: none; }
 .hdr.is-solid .pill--inline a { font-size: .8rem; padding: .45em .8em; }
-.hdr.is-solid .ib__lbl { display: none; }
+.hdr.is-solid .ib__lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .hdr.on-light:not(.is-solid) { color: var(--red-deep); }
 .hdr.on-light:not(.is-solid) .brand img { box-shadow: 0 0 0 2px var(--red-deep); }
 @media (max-width: 1180px) { .hdr.is-solid .pill--inline { display: none; } }
@@ -836,7 +836,7 @@ body.drawer-open, body.pd-open { overflow: hidden; }
   .hdr__right { gap: 10px; }
   .openNow, .hdr__row2, .btn-start { display: none; }
   .ib--menu { display: flex; order: 3; }
-  .ib__lbl { display: none; }
+  .ib__lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .brand__word { font-size: 1.5rem; }
   .brand img { width: 40px; height: 40px; }
   .slide__in { grid-template-columns: 1fr; text-align: center; padding-top: calc(var(--tick) + 84px); padding-bottom: 96px; gap: 6px; min-height: 0; }
@@ -1041,11 +1041,11 @@ body.lb-open { overflow: hidden; }
 .caja { background: var(--red); color: var(--cream); padding: clamp(72px, 9vw, 120px) 0; overflow: hidden; }
 .caja__grid { display: grid; grid-template-columns: 5fr 6fr; gap: clamp(32px, 6vw, 80px); align-items: center; }
 .caja__img { width: 100%; max-width: 480px; margin: 0 auto; border-radius: var(--radius); box-shadow: var(--shadow); }
-.caja .sub { opacity: .92; }
+.caja .sub { opacity: 1; color: var(--wine); font-weight: 500; }
 .caja .hl { color: var(--wine); }
 .caja .eyebrow { color: var(--wine); }
 .caja__steps { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 14px; }
-.caja__steps li { display: grid; grid-template-columns: 52px 1fr; gap: 16px; align-items: center; background: rgba(20,10,7,.2); border-radius: var(--radius-sm); padding: 14px 18px 14px 14px; }
+.caja__steps li { display: grid; grid-template-columns: 52px 1fr; gap: 16px; align-items: center; background: rgba(20,10,7,.34); border-radius: var(--radius-sm); padding: 14px 18px 14px 14px; }
 .caja__steps b { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--wine); color: var(--mustard); font-family: var(--font-display); font-weight: 400; font-size: 1.8rem; }
 
 /* ---------- faq ---------- */

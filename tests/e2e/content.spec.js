@@ -81,7 +81,7 @@ test("el sabor único y la Caja Transformer", async ({ page }) => {
   await expect(page.locator("#saborList li")).toHaveText([/Masa madre/, /Urucú/, /Salsa a la leña/]);
   await page.locator("#caja").scrollIntoViewIfNeeded();
   await expect(page.locator("#caja .caja__img")).toBeVisible();
-  expect(await page.locator("#caja .caja__img").evaluate((i) => i.naturalWidth)).toBeGreaterThan(0);
+  await expect.poll(() => page.locator("#caja .caja__img").evaluate((i) => i.complete && i.naturalWidth), { timeout: 10_000 }).toBeGreaterThan(0);
   await expect(page.locator("#cajaSteps li")).toHaveCount(3);
 });
 
