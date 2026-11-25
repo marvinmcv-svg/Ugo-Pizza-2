@@ -65,9 +65,12 @@
   let toastT;
   function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("is-on"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("is-on"), 2600); }
 
-  /* reveal */
-  const ro = "IntersectionObserver" in window && !reduced ? new IntersectionObserver((ens) => ens.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("is-in"); ro.unobserve(en.target); } }), { threshold: .12 }) : null;
+  /* reveal (also anything already scrolled past: a fast fling must never leave a section invisible) */
+  const ro = "IntersectionObserver" in window && !reduced ? new IntersectionObserver((ens) => ens.forEach((en) => { if (en.isIntersecting || en.boundingClientRect.bottom < 0) { en.target.classList.add("is-in"); ro.unobserve(en.target); } }), { threshold: [0, .12] }) : null;
   function observeReveal() { $$(".reveal:not(.is-in)").forEach((el) => (ro ? ro.observe(el) : el.classList.add("is-in"))); }
+  /* an observer never fires for an element jumped over in one scroll step: sweep anything at or above the fold */
+  let revealRaf = 0;
+  addEventListener("scroll", () => { if (revealRaf || !ro) return; revealRaf = requestAnimationFrame(() => { revealRaf = 0; for (const el of $$(".reveal:not(.is-in)")) if (el.getBoundingClientRect().top < innerHeight) { el.classList.add("is-in"); ro.unobserve(el); } }); }, { passive: true });
 
   /* ====================== TICKER ====================== */
   (function ticker() {
@@ -108,27 +111,30 @@
   /* ====================== HERO ====================== */
   const star = U.combos.find((c) => c.star) || U.combos[0];
   const best = CAT.cheeseburguer;
+  /* hero media: clean cut-out photos (transparent webp from the official menu), never cropped promo posters */
+  const pz = (id, cls = "", alt = "") => `<img class="hp ${cls}" src="${CAT[id] ? CAT[id].img : `assets/img/pizza-${id}.webp`}" width="760" height="543" alt="${esc(alt)}"${cls.includes("hp--b") ? ' aria-hidden="true"' : ""}>`;
+  const drink = (d) => `<span class="drinktag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6v3l1.5 2.5V21a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V7.5L9 5z"/><path d="M7.5 12h9"/></svg>+ ${esc(d)}</span>`;
+  const sticker = `<div class="sticker" aria-hidden="true"><svg viewBox="0 0 128 128"><defs><path id="stk" d="M64,64 m-50,0 a50,50 0 1,1 100,0 a50,50 0 1,1 -100,0"/></defs><circle cx="64" cy="64" r="63"/><text><textPath href="#stk">SÓLO PARA HERMOSOS · UGO'S PIZZA ·</textPath></text></svg><b>8<small>PORCIONES</small></b></div>`;
   const slides = [
     { cls: "red", kicker: "Combo para compartir", t1: "2 Jamoneitor", t2: "+ Pepsi 2 L", price: star.price, desc: "Dos pizzas familiares de 8 porciones y la Pepsi de 2 litros.", add: star.id,
-      media: `<img class="photo" src="assets/hero/slide-2-jamoneitor.webp" width="1000" height="750" alt="Dos pizzas Jamoneitor con Pepsi de 2 litros, 100 Bs" fetchpriority="high">
-        <div class="sticker" aria-hidden="true"><svg viewBox="0 0 128 128"><defs><path id="stk" d="M64,64 m-50,0 a50,50 0 1,1 100,0 a50,50 0 1,1 -100,0"/></defs><circle cx="64" cy="64" r="63"/><text><textPath href="#stk">SÓLO PARA HERMOSOS · UGO'S PIZZA ·</textPath></text></svg><b>8<small>PORCIONES</small></b></div>`,
+      media: `<div class="duo">${pz("jamoneitor", "hp--a", "Dos pizzas Jamoneitor familiares")}${pz("jamoneitor", "hp--b")}${drink("Pepsi 2 L")}${sticker}</div>`,
       terms: "8 porciones · tamaño familiar · en sucursal o por WhatsApp" },
     yapaOn && { cls: "cream", light: true, kicker: `Promo de ${U.yapa.month}`, t1: "Jamoneitor", t2: "por La Scoobyneta", price: U.yapa.price, desc: `<s>${money(U.yapa.regular)}</s> · sólo pidiendo por La Scoobyneta, primeras 100 pizzas del día.`, add: U.yapa.id,
-      media: `<img class="photo" src="assets/img/pizza-jamoneitor.webp" width="760" height="543" alt="Pizza Jamoneitor"><span class="pricetag">¡Ahorrá ${money(U.yapa.regular - U.yapa.price)}!</span>`,
+      media: `<div class="duo duo--one">${pz("jamoneitor", "hp--a", "Pizza Jamoneitor")}<span class="pricetag">¡Ahorrá ${money(U.yapa.regular - U.yapa.price)}!</span></div>`,
       terms: `Válido todo ${U.yapa.month} pidiendo por La Scoobyneta (76066200)` },
     { cls: "wine", kicker: "La más vendida", t1: "Cheese", t2: "burguer", price: best.price, desc: "Carne molida, tocino y cheddar sobre masa madre. Familiar de 8 porciones.", add: "cheeseburguer",
       bg: `<img src="assets/hero/cheeseburguer-hd.webp" alt="" width="576" height="1024">`,
       media: `<div class="reelcard"><video muted playsinline loop preload="none" poster="assets/hero/cheeseburguer-hd.webp" data-src="assets/hero/cheeseburguer-hd.mp4" width="576" height="1024"></video></div><div class="blob">¡Probá la más pedida!</div>`,
       terms: "Precio de carta · tamaño familiar de 8 porciones" },
     CAT["combo-bruto-tocino"] && { cls: "red", kicker: "Combo bien cargado", t1: "Bruto Tocino", t2: "+ Pepsi 2 L", price: CAT["combo-bruto-tocino"].price, desc: "Tocino, cheddar y orégano sobre masa madre, con la Pepsi de 2 litros.", add: "combo-bruto-tocino",
-      media: `<img class="photo" src="assets/img/combo-bruto-tocino.webp" width="720" height="540" alt="Pizza Bruto Tocino con Pepsi de 2 litros, 65 Bs" loading="lazy">`,
+      media: `<div class="duo duo--one">${pz("bruto-tocino", "hp--a", "Pizza Bruto Tocino familiar")}${drink("Pepsi 2 L")}</div>`,
       terms: "8 porciones · tamaño familiar · en sucursal o por WhatsApp" },
     CAT.ugos && { cls: "cream", light: true, kicker: "La de la casa", t1: "Ugo's", t2: "borde de salchichas", price: CAT.ugos.price, desc: "Volcán de crema de cheddar al centro, jamón y orégano. La firma de la casa.", add: "ugos",
-      media: `<img class="photo" src="assets/img/pizza-ugos.webp" width="760" height="481" alt="Pizza Ugo's con borde de salchichas y volcán de cheddar" loading="lazy"><span class="pricetag">¡La de la casa!</span>`,
+      media: `<div class="duo duo--one">${pz("ugos", "hp--a", "Pizza Ugo's con borde de salchichas y volcán de cheddar")}<span class="pricetag">¡La de la casa!</span></div>`,
       terms: "Precio de carta · tamaño familiar de 8 porciones" },
     CAT["combo-2-salchichonas"] && { cls: "wine", kicker: "Para la junta", t1: "2 Salchichonas", t2: "+ Pepsi 2 L", price: CAT["combo-2-salchichonas"].price, desc: "Dos familiares de salchicha con la Pepsi de 2 litros: 16 porciones.", add: "combo-2-salchichonas",
-      bg: `<img src="assets/img/combo-2-salchichonas.webp" alt="" width="720" height="540" loading="lazy">`,
-      media: `<img class="photo" src="assets/img/combo-2-salchichonas.webp" width="720" height="540" alt="Dos pizzas Salchichona con Pepsi de 2 litros, 100 Bs" loading="lazy">`,
+      bg: `<img src="assets/img/pizza-salchichona.webp" alt="" width="760" height="543" loading="lazy">`,
+      media: `<div class="duo">${pz("salchichona", "hp--a", "Dos pizzas Salchichona familiares")}${pz("salchichona", "hp--b")}${drink("Pepsi 2 L")}</div>`,
       terms: "8 porciones cada una · tamaño familiar" },
     { cls: "red", kicker: "Pizza + gaseosa", t1: "Combos", t2: "familiares", price: Math.min(...U.combos.map((c) => c.price)), desc: "Jamoneitor, Salchichona o Chocluda con su gaseosa de 2 litros. Elegí el tuyo.", add: "combo-jamoneitor",
       media: `<div class="fan">${["promo-salchichona", "promo-jamoneitor", "promo-chocluda"].map((n, i) => `<img src="assets/img/${n}.webp" width="900" height="889" alt="" loading="lazy" style="--i:${i - 1}">`).join("")}</div>`,
@@ -143,6 +149,7 @@
           <h2 class="slide__t">${esc(s.t1)}<span>${esc(s.t2)}</span></h2>
           <div class="price"><span class="price__cur">Bs</span><span class="price__n">${s.price}</span><span class="price__d">${s.desc}</span></div>
           <div class="ctas"><button class="btn btn--mustard btn--lg" data-add="${esc(s.add)}">Sumar al pedido</button><a class="btn ${s.light ? "btn--outline" : "btn--ghost"} btn--lg" href="${s.cta2 ? s.cta2[1] : "#carta"}">${s.cta2 ? s.cta2[0] : "Ver la carta"}</a></div>
+          <p class="slide__terms">${esc(s.terms)}</p>
         </div>
         <div class="slide__media">${s.media}</div>
       </div>
@@ -154,7 +161,6 @@
     cur = (i + slides.length) % slides.length;
     slideEls.forEach((el, k) => { const on = k === cur; el.classList.toggle("is-active", on); el.inert = !on; });
     $$("button", dotsEl).forEach((d, k) => d.setAttribute("aria-selected", k === cur));
-    $("#terms").textContent = slides[cur].terms;
     const light = !!slides[cur].light; hdr.classList.toggle("on-light", light); hero.classList.toggle("on-light", light);
     syncHeroVideo();
   }
@@ -611,12 +617,21 @@
     media.addEventListener("touchend", (e) => { if (sx == null) return; const d = e.changedTouches[0].clientX - sx; if (Math.abs(d) > 50) show(at + (d < 0 ? 1 : -1)); sx = null; });
     return { close, isOpen: () => !box.hidden };
   })();
+  /* ====================== SABOR / CAJA / FAQ ====================== */
+  $("#saborList").innerHTML = U.flavor.items.map((f) => `<li class="reveal"><b>${esc(f.k)}</b><span>${esc(f.v)}</span></li>`).join("");
+  $("#cajaSteps").innerHTML = U.box.steps.map((st) => `<li><b>${esc(st.k)}</b><span>${esc(st.v)}</span></li>`).join("");
+  $("#faqList").innerHTML = U.faq.map((f, i) => `<details class="qa"${i === 0 ? " open" : ""}><summary>${esc(f.q)}<i aria-hidden="true"></i></summary><p>${esc(f.a)}</p></details>`).join("");
+  $("#faqWa").href = U.waUrl(U.config.callCenter, "¡Hola Ugo's! 😎 Tengo una consulta");
+  const faqLd = document.createElement("script"); faqLd.type = "application/ld+json";
+  faqLd.textContent = JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: U.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) });
+  document.head.appendChild(faqLd);
+
   $("#jobsT").textContent = U.jobs.title; $("#jobsP").textContent = U.jobs.text;
   $("#jobsBtn").href = U.waUrl(U.config.callCenter, U.jobs.wa);
   const groups = [
-    ["Productos", [["La carta gira", "#carta"], ["Carta completa", "#menu"], ["Combos", "#combos"], ["La más vendida", "#combos"]]],
-    ["Promos", [["Promos vigentes", "#promos"], ...(yapaOn ? [[`Jamoneitor ${money(U.yapa.price)}`, "#yapa"]] : []), ["Instagram", U.config.instagram]]],
-    ["Pedidos", [["Pedí en 4 pasos", "#pedir"], ["La Scoobyneta", U.waUrl(U.delivery.whatsapp, "¡Hola Scoobyneta! 🚌")], ["Call center 60007071", U.waUrl(U.config.callCenter, "¡Hola Ugo's! 😎")], ["Franquicias", "#pale"]]],
+    ["Productos", [["La carta gira", "#carta"], ["Carta completa", "#menu"], ["El sabor único", "#sabor"], ["Caja Transformer", "#caja"], ["Combos", "#combos"], ["La más vendida", "#combos"]]],
+    ["Promos", [["Promos vigentes", "#promos"], ...(yapaOn ? [[`Jamoneitor ${money(U.yapa.price)}`, "#yapa"]] : []), ["Instagram", U.config.instagram], ["TikTok", U.config.tiktok], ["Facebook", U.config.facebook]]],
+    ["Pedidos", [["Pedí en 4 pasos", "#pedir"], ["La Scoobyneta", U.waUrl(U.delivery.whatsapp, "¡Hola Scoobyneta! 🚌")], ["Call center 60007071", U.waUrl(U.config.callCenter, "¡Hola Ugo's! 😎")], ["Franquicias", "#pale"], ["Preguntas frecuentes", "#preguntas"], ["Trabajá con nosotros", "#trabajo"]]],
     ["Sucursales", U.branches.map((b) => [b.name, b.maps])],
   ];
   $("#fgroups").innerHTML = groups.map(([t, ls]) => `<details><summary>${esc(t)}</summary><ul>${ls.map(([n, h]) => `<li><a href="${esc(h)}"${/^http/.test(h) ? ' target="_blank" rel="noopener"' : ""}>${esc(n)}</a></li>`).join("")}</ul></details>`).join("");

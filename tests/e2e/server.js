@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const ROOT = path.resolve(__dirname, "../..");
 const PORT = Number(process.env.PORT) || 4173;
-const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".webmanifest": "application/manifest+json", ".ico": "image/x-icon", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml", ".mp4": "video/mp4", ".woff2": "font/woff2" };
+const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".webmanifest": "application/manifest+json", ".ico": "image/x-icon", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml", ".mp4": "video/mp4", ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8", ".xml": "application/xml" };
 
 function resolve(urlPath) {
   const clean = decodeURIComponent(urlPath.split("?")[0]);
@@ -24,7 +24,7 @@ http.createServer((req, res) => {
     return res.end(JSON.stringify({ error: req.method === "POST" ? "not_configured" : "method_not_allowed" }));
   }
   const file = resolve(req.url);
-  if (!file) { res.writeHead(404, { "Content-Type": "text/plain" }); return res.end("not found"); }
+  if (!file) { res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" }); return fs.createReadStream(path.join(ROOT, "404.html")).pipe(res); } // like Vercel
   const type = TYPES[path.extname(file).toLowerCase()] || "application/octet-stream";
   const size = fs.statSync(file).size;
   const range = /bytes=(\d*)-(\d*)/.exec(req.headers.range || "");

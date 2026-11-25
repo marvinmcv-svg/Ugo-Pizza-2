@@ -33,7 +33,7 @@
   <link rel="preload" as="image" href="assets/hero/slide-2-jamoneitor.webp" fetchpriority="high">
 
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"Restaurant","name":"Ugo's Pizza","slogan":"Sólo para hermosos","servesCuisine":["Pizza"],"priceRange":"Bs 44 – Bs 100","url":"https://ugos-pizza-2.vercel.app/","logo":"https://ugos-pizza-2.vercel.app/assets/brand/logo-512.png","image":"https://ugos-pizza-2.vercel.app/assets/brand/ugos-logo-share.jpg","telephone":"+59160007071","address":{"@type":"PostalAddress","addressLocality":"Santa Cruz de la Sierra","addressCountry":"BO"},"sameAs":["https://www.instagram.com/ugos_pizza/"]}
+  {"@context":"https://schema.org","@type":"Restaurant","name":"Ugo's Pizza","slogan":"Sólo para hermosos","servesCuisine":["Pizza"],"priceRange":"Bs 44 – Bs 100","url":"https://ugos-pizza-2.vercel.app/","logo":"https://ugos-pizza-2.vercel.app/assets/brand/logo-512.png","image":"https://ugos-pizza-2.vercel.app/assets/brand/ugos-logo-share.jpg","telephone":"+59160007071","address":{"@type":"PostalAddress","addressLocality":"Santa Cruz de la Sierra","addressCountry":"BO"},"sameAs":["https://www.instagram.com/ugos_pizza/","https://www.tiktok.com/@ugospizza","https://www.facebook.com/PizzaUgos"],"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"12:00","closes":"01:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Tuesday","opens":"17:00","closes":"01:00"}],"hasMenu":"https://ugos-pizza-2.vercel.app/#menu","acceptsReservations":false}
   </script>
 </head>
 <body>
@@ -71,7 +71,6 @@
       <div class="hero__stack" id="slides"></div>
       <div class="hero__ctrl wrap">
         <div class="dots" id="dots" role="tablist" aria-label="Elegir promo"></div>
-        <p class="terms" id="terms"></p>
       </div>
       <aside class="qr" id="qrCard">
         <button class="qr__x" aria-label="Ocultar QR" id="qrX">✕</button>
@@ -170,6 +169,18 @@
         <div class="coins" id="coins"></div>
         <div class="tabs" role="tablist" id="tabs" aria-label="Categorías"></div>
         <div id="menuPanels"></div>
+      </div>
+    </section>
+
+    <!-- 9b. El sabor único (HOME ingredients banner) -->
+    <section class="sabor" id="sabor" aria-labelledby="saborT">
+      <div class="wrap">
+        <div class="shead shead--light center">
+          <p class="eyebrow">Ingredientes</p>
+          <h2 class="display" id="saborT">El sabor único <span class="hl">de Ugo's</span></h2>
+        </div>
+        <figure class="sabor__band"><img src="assets/img/ingredientes.webp" width="1100" height="286" alt="Masa madre, urucú y salsa preparada a la leña" loading="lazy"></figure>
+        <ul class="sabor__list" id="saborList"></ul>
       </div>
     </section>
 
@@ -307,7 +318,7 @@
           <p class="sub">Somos una cadena 100% boliviana. Dejanos tus datos y te escribimos con la ficha técnica.</p>
           <form class="frform" id="frForm" novalidate>
             <div class="frform__row"><label>Nombre<input name="name" autocomplete="name" maxlength="60" required></label><label>Celular<input name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" required></label></div>
-            <div class="frform__row"><label>Ciudad<input name="city" maxlength="40" placeholder="Santa Cruz, Cochabamba…"></label><label>Comentario <em>opcional</em><input name="note" maxlength="140" placeholder="¿Tenés local?"></label></div>
+            <div class="frform__row"><label>Ciudad<input name="city" maxlength="40" placeholder="Santa Cruz, Cochabamba…"></label><label><span>Comentario <em>opcional</em></span><input name="note" maxlength="140" placeholder="¿Tenés local?"></label></div>
             <button class="btn btn--dark btn--lg" type="submit">Quiero una franquicia →</button>
             <p class="frform__msg" id="frMsg" role="status"></p>
           </form>
@@ -323,12 +334,38 @@
       </div>
     </section>
 
+    <!-- 15b. Caja Transformer (HOME slider) -->
+    <section class="caja" id="caja" aria-labelledby="cajaT">
+      <div class="wrap caja__grid">
+        <img class="caja__img" src="assets/img/caja-transformer-ugo.webp" width="612" height="765" alt="Ugo sosteniendo la Caja Transformer de Ugo's Pizza" loading="lazy">
+        <div>
+          <p class="eyebrow">Sólo en Ugo's</p>
+          <h2 class="display" id="cajaT">Nuestra caja <span class="hl">Transformer</span></h2>
+          <p class="sub">No es sólo una caja: se transforma en platos y en una mini caja para llevar.</p>
+          <ol class="caja__steps" id="cajaSteps"></ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15c. FAQ -->
+    <section class="faq" id="preguntas" aria-labelledby="faqT">
+      <div class="wrap faq__grid">
+        <div class="shead">
+          <p class="eyebrow">Preguntas frecuentes</p>
+          <h2 class="display" id="faqT">¿Tenés <span class="hl">dudas</span>?</h2>
+          <p class="sub">Lo que más nos preguntan. ¿Algo más? Escribinos o preguntale a Ugo·IA.</p>
+          <div class="faq__cta"><a class="btn btn--wa" id="faqWa" href="#" target="_blank" rel="noopener">WhatsApp 60007071</a><button class="btn btn--ghost" data-open-chat>Preguntale a Ugo·IA ✨</button></div>
+        </div>
+        <div class="faq__list" id="faqList"></div>
+      </div>
+    </section>
+
     <!-- 16. Instagram feed -->
     <section class="feed" id="instagram" aria-labelledby="feedT">
       <div class="wrap">
         <div class="feed__head">
-          <h2 class="display" id="feedT">Seguinos en <span class="hl">Instagram</span></h2>
-          <a class="btn btn--red" href="https://www.instagram.com/ugos_pizza/" target="_blank" rel="noopener">@ugos_pizza ↗</a>
+          <h2 class="display" id="feedT">Seguinos en <span class="hl">redes</span></h2>
+          <div class="feed__social"><a class="btn btn--red" href="https://www.instagram.com/ugos_pizza/" target="_blank" rel="noopener">Instagram ↗</a><a class="btn btn--dark" href="https://www.tiktok.com/@ugospizza" target="_blank" rel="noopener">TikTok ↗</a><a class="btn btn--outline" href="https://www.facebook.com/PizzaUgos" target="_blank" rel="noopener">Facebook ↗</a></div>
         </div>
         <div class="fgrid" id="fgrid"></div>
       </div>
@@ -361,6 +398,8 @@
         <a class="brand" href="#top"><img src="assets/img/logo.png" width="40" height="40" alt=""><span class="brand__word">Ugo's Pizza</span></a>
         <div class="socials">
           <a href="https://www.instagram.com/ugos_pizza/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a href="https://www.tiktok.com/@ugospizza" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.4 2.6 2.2 4.4 5 4.6"/></svg></a>
+          <a href="https://www.facebook.com/PizzaUgos" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 21v-8h3l.5-3.5H14V7.6c0-1 .3-1.7 1.8-1.7h1.8V2.8A24 24 0 0 0 15 2.7c-2.6 0-4.4 1.6-4.4 4.5v2.3H7.7V13h2.9v8"/></svg></a>
           <a id="ftrWa" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9c0 3 3 6 6 6l1-1.5-2-1-1 1c-1-.5-2-1.5-2.5-2.5l1-1-1-2z"/></svg></a>
           <a id="ftrPhone" href="#" aria-label="Llamar"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></a>
         </div>

@@ -24,6 +24,8 @@
       country: "Bolivia",
       callCenter: "59160007071",                          // HOME wa.me/59160007071 + IG captions "Haz tu pedido al WhatsApp"
       instagram: "https://www.instagram.com/ugos_pizza/",
+      tiktok: "https://www.tiktok.com/@ugospizza",         // HOME "Síguenos en nuestras redes sociales"
+      facebook: "https://www.facebook.com/PizzaUgos",       // HOME "Síguenos en nuestras redes sociales"
       website: "https://www.ugospizzas.com/",
       franchises: "https://ugospizzas.com/franquicias/",  // HOME "¿Querés tu propia sucursal?"
       timezone: "America/La_Paz",
@@ -116,7 +118,7 @@
     ],
 
     featured: [
-      { ref: "cheeseburguer", name: "Cheeseburguer", tag: "La más vendida", video: "assets/video/cheeseburguer", img: "assets/video/cheeseburguer.webp", desc: "Carne molida, tocino y cheddar. La más pedida de Ugo's." },   // IG Df98OMcuhXH
+      { ref: "cheeseburguer", name: "Cheeseburguer", tag: "La más vendida", img: "assets/img/pizza-cheeseburguer.webp", desc: "Carne molida, tocino y cheddar. La más pedida de Ugo's." },   // IG Df98OMcuhXH
       { ref: "ugos", name: "Ugo's", tag: "La de la casa", img: "assets/img/pizza-ugos.webp", desc: "Borde de salchichas y un volcán de crema de cheddar al centro." }, // MENU
       { ref: "promo-jamoneitor-35", name: "Jamoneitor a 35", tag: "Por La Scoobyneta", img: "assets/img/pizza-jamoneitor.webp", desc: "En noviembre, pidiendo por La Scoobyneta. Primeras 100 del día." }, // IG DfapG5MludI
     ],
@@ -145,6 +147,7 @@
       "Para pedidos generales está el WhatsApp 60007071.",
       "Ugo's tiene la Caja Transformer: la caja se divide por las líneas en cuatro platos, y doblándola tenés una mini caja para llevar.",
       "Ugo's está preparando una nueva pizza 'combinación carnívora' que llegará pronto (todavía sin nombre ni precio).",
+      "Ugo's está en Instagram (@ugos_pizza), TikTok (@ugospizza) y Facebook (PizzaUgos).",
       "Ugo's ofrece franquicias: se piden en la sección Franquicias de esta página (formulario que llega por WhatsApp al call center).",
       "No tenemos información publicada de alérgenos, costo de delivery ni medios de pago: eso se consulta con la sucursal.",
     ],
@@ -180,6 +183,38 @@
       { img: "assets/img/ig-DfkrFlzoHYR.webp", source: "IG DfkrFlzoHYR", alt: "Tu Jamoneitor a 35 Bs" , add: "promo-jamoneitor-35" },
       { img: "assets/img/ig-DfkMuSflkbP.webp", source: "IG DfkMuSflkbP", alt: "Ugo's está preparando algo nuevo" },
       { img: "assets/img/ig-DfC0seNoVa7.webp", source: "IG DfC0seNoVa7", alt: "Conquistá a tu suegra con una pizza de Ugo's" },
+    ],
+
+    // HOME banner "TEXTO-el-mejor-Sabor" + "Ingredientes": masa madre, urucú, salsa preparada a la leña
+    flavor: {
+      img: "assets/img/ingredientes.webp",
+      items: [
+        { k: "Masa madre", v: "La base de todas nuestras pizzas, de la Jamoneitor a la Ugo's." },
+        { k: "Urucú", v: "Un ingrediente bien nuestro, parte del sabor único de Ugo's." },
+        { k: "Salsa a la leña", v: "Salsa de tomate preparada a la leña: va en todas las pizzas de la carta." },
+      ],
+    },
+
+    // HOME slider "SLIDER-CEL-CAJA-1/2/3": Caja Transformer
+    box: {
+      img: "assets/img/caja-transformer-ugo.webp",
+      steps: [
+        { k: "1", v: "Abrí la caja y servite tu pizza." },
+        { k: "2", v: "Cortá por las líneas: la tapa se vuelve cuatro platos." },
+        { k: "3", v: "Doblá lo que queda y tenés una mini caja para llevar lo que sobró." },
+      ],
+    },
+
+    // Answers only from published facts (MENU, UBIC, IG, HOME). Unknowns say "consultá en tu sucursal".
+    faq: [
+      { q: "¿Qué tamaño tienen las pizzas?", a: "Todas las pizzas de la carta son tamaño familiar de 8 porciones. Los precios de la carta son por la familiar." },
+      { q: "¿Cuál es el horario?", a: "Todas las sucursales abren todos los días de 12:00 a 01:00, excepto los martes, que abren de 17:00 a 01:00." },
+      { q: "¿Hacen delivery?", a: "Sí. La Scoobyneta es el delivery de Ugo's: escribí al WhatsApp 76066200. También podés pedir al call center 60007071 o directo a tu sucursal." },
+      { q: "¿Cómo hago un pedido por esta web?", a: "Armá tu pedido en \"Pedí por WhatsApp\" (4 pasos) o con Ugo·IA. Al final se abre WhatsApp con el mensaje listo para la sucursal que elegiste; nada se envía hasta que vos lo mandes." },
+      { q: "¿Cuánto cuesta el delivery y cómo pago?", a: "El costo de envío y los medios de pago dependen de la zona y la sucursal. Consultalo por WhatsApp al hacer tu pedido." },
+      { q: "¿Tienen opciones sin carne?", a: "Sí: Napolitana, Margarita, Chocluda y 4 Quesos no llevan carne. Para alergias o intolerancias, consultá en tu sucursal." },
+      { q: "¿Cómo pido la promo de Jamoneitor a Bs 35?", a: "Es la promo de noviembre: la Jamoneitor sale Bs 35 (en vez de Bs 47) sólo pidiendo por La Scoobyneta al 76066200, para las primeras 100 pizzas del día." },
+      { q: "¿Puedo tener una franquicia de Ugo's?", a: "Sí. Dejá tus datos en la sección Franquicias y te escribimos por WhatsApp con la ficha técnica." },
     ],
 
     // HOME: "¿QUIERES TRABAJAR CON NOSOTROS? CONTÁCTANOS"

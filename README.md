@@ -11,6 +11,8 @@ Sitio estático sin build + una función serverless de Vercel (`/api/ugoia`). No
 - **"¿Dónde querés tu pedido?"**: delivery/recojo + sucursal con estado en vivo → embudo de WhatsApp.
 - **La carta gira**: una mesa giratoria de madera con las 18 pizzas. Arrastrá, deslizá o usá las flechas; tocá la pizza para ver ingredientes, alérgenos (consultar en sucursal), tamaño, combo y "Añadir al pedido".
 - Carta completa con pestañas, 9 combos con foto, destacados, reels, embudo de 4 pasos con vista previa del WhatsApp, 9 sucursales con horario en vivo, franquicias, historia, Instagram, "trabajá con nosotros", footer con menús desplegables.
+- **El sabor único** (masa madre, urucú, salsa a la leña), **Caja Transformer** y **Preguntas frecuentes** (con datos estructurados FAQPage), todo desde `js/data.js` (`flavor`, `box`, `faq`).
+- Redes oficiales: Instagram, TikTok y Facebook. Página `404.html` propia, `robots.txt` (bloquea `/crm`) y `sitemap.xml`.
 - **Carrito** compartido entre la web y Ugo·IA (`localStorage`).
 - **Ugo·IA**: herramientas deterministas (el modelo nunca calcula precios), confirmación forzada por el servidor, Mi Pedido ("lo de siempre"), Entrega con Pin, Sigue tu Pizza (versión honesta), voz con Web Speech API.
 
@@ -51,6 +53,11 @@ Panel interno para operar la cadena. No está enlazado desde la web pública y t
 - La carta, precios y sucursales salen de `js/data.js` (la misma fuente que la web).
 - **Datos:** hoy viven en el navegador (`localStorage`), con datos de demostración la primera vez ("Empezar en limpio" los borra). Los pedidos y leads de la web entran solos **si se hacen en el mismo navegador**. Para varias sucursales y dispositivos a la vez hace falta una base de datos: todo pasa por `load()`/`save()` en `store.js`, que es lo único a reemplazar. También hace falta login real antes de usarlo con datos de clientes.
 - Recetas y costos de insumos son estimaciones editables (Inventario → Recetas y costos).
+
+## Tests
+
+- `npm test`: herramientas de Ugo·IA (node:test).
+- `npm run test:e2e`: Playwright en 9 dispositivos (3 desktop, iPad Mini, iPhone SE, iPhone 15 Pro Max, Pixel 7, Galaxy S8, iPhone horizontal). Calidad (consola, imágenes, axe, scroll horizontal, objetivos táctiles), Web Vitals, interacciones (hero, mesa giratoria, carrito, embudo de WhatsApp, Ugo·IA, lightbox, franquicias), CRM y `content.spec.js`: la carta y las sucursales comparadas con ugospizzas.com, hero completo bajo el header, alineación de formularios y grillas, FAQ, redes, 404/robots/sitemap.
 
 ## Correr local
 
